@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>
+korokoro
+</title>
+
+<style>
+body
+{
+	margin: 0 !important;
+	padding: 10px !important;
+}
+
+#outer
+{
+	margin: 0 !important;
+	height: 100%;
+	width: 100%;
+	background-color: white;
+}
+
+#container
+{
+	cursor: none;
+	margin: 0 auto;
+	height: 640px;
+	width: 1024px;
+	background-color: black;
+}
+
+#note
+{
+	margin: 0 auto;
+	width: 1024px;
+}
+</style>
+
+<script src="../libs/three.min.js">
+</script>
+
+<script type="text/javascript">
+
+var c_buttonA = 0;
+var c_buttonB = 1;
+var c_buttonX = 2;
+var c_buttonY = 3;
+var c_buttonBack = 8;
+var c_buttonStart = 9;
+var c_buttonUp = 12;
+var c_buttonDown = 13;
+var c_buttonLeft = 14;
+var c_buttonRight = 15;
+
+var _rAF = window.mozRequestAnimationFrame ||
+	window.requestAnimationFrame ||
+	window.webkitRequestAnimationFrame;
+
+var _scene;
+var _renderer;
+var _camera;
+var _cameraPos = { x: 0, y: 0, z: 3.3333 };
+
+var _gamepad1;
+var _gamepad2;
+
+var _marble1 = { textureName: 'images/texture1.png', mesh: null };
+var _marble2 = { textureName: 'images/texture2.png', mesh: null };
+
+function onLoadFunc() 
+{ 
+	// Grab our container div 
+	var container = document.getElementById("container"); 
+
+	// Create the Three.js renderer, add it to our div 
+	_renderer = new THREE.WebGLRenderer();
+	_renderer.setSize(container.offsetWidth, container.offsetHeight);
+	container.appendChild(_renderer.domElement); 
+
+	// Create a new Three.js scene 
+	_scene = new THREE.Scene(); 
+
+	// Put in a camera 
+	_camera = new THREE.PerspectiveCamera
+		(45, container.offsetWidth / container.offsetHeight, 1, 4000 ); 
+	_camera.position.set(_cameraPos.x, _cameraPos.y, _cameraPos.z );
+
+	// Create a directional light to show off the object 
+	var light = new THREE.DirectionalLight(0xffffff, 1.5); 
+	light.position.set(0, 0, 1);
+	_scene.add(light); 
+
+	// Create a shaded, texture-mapped cube, objects and add them to the scene 
+	var texLoader = new THREE.TextureLoader();
+	var radius = 0.16;
+	var segment = 32;
+
+	texLoader.load(_marble1.textureName, function(texture) {
+		var material = new THREE.MeshPhongMaterial({ map: texture });
+		var geometry = new THREE.SphereGeometry(radius, segment, segment);
+		_marble1.mesh = new THREE.Mesh(geometry, material);
+		_marble1.mesh.rotation = 0;
+		_marble1.mesh.position.x = 0.5;
+		_marble1.mesh.position.y = -0.5;
+		_scene.add(_marble1.mesh);
+	});
+
+	texLoader.load(_marble2.textureName, function(texture) {
+		var material = new THREE.MeshPhongMaterial({ map: texture });
+		var geometry = new THREE.SphereGeometry(radius, segment, segment);
+		_marble2.mesh = new THREE.Mesh(geometry, material);
+		_marble2.mesh.rotation = 0;
+		_marble2.mesh.position.x = -0.5;
+		_marble2.mesh.position.y = -0.5;
+		_scene.add(_marble2.mesh);
+	});
+
+	var material = new THREE.MeshPhongMaterial({ color: 0xffcccc });
+	var geometry = new THREE.CubeGeometry(1, 1, 1); 
+	var cubeMesh = new THREE.Mesh(geometry, material); 
+	cubeMesh.rotation.x = Math.PI / 5; 
+	cubeMesh.rotation.y = Math.PI / 5; 
+	cubeMesh.position.x = 0;
+	cubeMesh.position.y = 0;
+	cubeMesh.position.z = -1.0;
+	_scene.add(cubeMesh);
+
+	// Don't need to render here. (Textures are not loaded at this point anyway.)
+}
+
+function scanGamepads()
+{
+	_gamepad1 = null;
+	_gamepad2 = null;
+
+	var gamepads = navigator.getGamepads();
+	if (gamepads)
+	{
+		if (gamepads.length > 0)
+			_gamepad1 = gamepads[0];
+
+		if (gamepads.length > 1)
+			_gamepad2 = gamepads[1];
+	}
+}
+
+function isButtonPressed(button)
+{
+	var pressed = button == 1.0;
+	if (typeof(button) == "object")
+	{
+		pressed = button.pressed;
+		button = button.value;
+	}
+	return pressed;
+}
+
+function updatePlayer(gamepad, marble)
+{
+	if (!gamepad)
+		return;
+
+	var buttons = gamepad.buttons;
+	for (var i = 0; i < buttons.length; i++)
+	{
+		if (isButtonPressed(buttons[i]))
+		{
+			marble.mesh.rotation.x -= 0.05;
+			if (i == c_buttonRight)
+				marble.mesh.position.x -= 0.01;
+			else if (i == c_buttonLeft)
+				marble.mesh.position.x += 0.01;
+			else if (i == c_buttonUp)
+				_cameraPos.y += 0.01;
+			else if (i == c_buttonDown)
+				_cameraPos.y -= 0.01;
+		}
+	}
+}
+
+function updateStatus()
+{
+	scanGamepads();
+
+	updatePlayer(_gamepad1, _marble1);
+	updatePlayer(_gamepad2, _marble2);
+
+	_camera.position.set(_cameraPos.x, _cameraPos.y, _cameraPos.z);
+	_renderer.render(_scene, _camera);
+
+	_rAF(updateStatus)
+}
+
+function addGamepad(gamepad)
+{
+	console.log("index: " + gamepad.index);
+	console.log("id: " + gamepad.id);
+	console.log("buttons.length: " + gamepad.buttons.length);
+	console.log("axes.length: " + gamepad.axes.length);
+
+	updateStatus();
+}
+
+function removeGamepad(gamepad)
+{
+	console.log("index: " + gamepad.index);
+	console.log("id: " + gamepad.id);
+}
+
+function connectHandler(e)
+{
+	addGamepad(e.gamepad);
+}
+
+function disconnectHandler(e)
+{
+	removeGamepad(e.gamepad);
+}
+
+function run()
+{
+	window.addEventListener("load", function() {
+		onLoadFunc();
+	});
+
+	var haveEvents = 'GamepadEvent' in window;
+	if (haveEvents)
+	{
+		window.addEventListener("gamepadconnected", connectHandler);
+		window.addEventListener("gamepaddisconnected", disconnectHandler);
+	}
+	else
+	{
+		setInterval(scanGamepads, 500);
+	}
+}
+
+// main function
+(function() {
+	console.log("korkokoro starts...");
+	run();
+})();
+
+</script>
+</head>
+
+<body>
+<div id="outer">
+	<div id="container">
+	</div>
+	<div id="note">
+		When you reload this page, gamepads may not be detected.
+		Switch to another chrome tab and come back. Gamepads probably will start working again.
+	</div>
+</div>
+</body>
+
+</html>
