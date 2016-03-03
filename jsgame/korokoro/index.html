@@ -38,8 +38,10 @@ body
 }
 </style>
 
-<script src="../libs/three.min.js">
-</script>
+<script src="../libs/three.min.js"></script>
+<script src="racetrack.js"></script>
+<script src="marble.js"></script>
+<script src="randomcube.js"></script>
 
 <script type="text/javascript">
 
@@ -66,11 +68,12 @@ var _cameraPos = { x: 0, y: 1.3333, z: 3.3333 };
 var _gamepad1;
 var _gamepad2;
 
-var _marble1 = { textureName: 'images/texture1.png', mesh: null };
-var _marble2 = { textureName: 'images/texture2.png', mesh: null };
+var _marble1; // = { textureName: 'images/texture1.png', mesh: null };
+var _marble2; // = { textureName: 'images/texture2.png', mesh: null };
+
 
 function onLoadFunc() 
-{ 
+{
 	// Grab our container div 
 	var container = document.getElementById("container"); 
 
@@ -94,160 +97,41 @@ function onLoadFunc()
 
 	// Create a shaded, texture-mapped cube, objects and add them to the scene 
 	var texLoader = new THREE.TextureLoader();
-	var radius = 0.16;
-	var segment = 32;
 
+	_marble1 = new Marble(_scene, 'images/texture1.png');
 	texLoader.load(_marble1.textureName, function(texture) {
-		var material = new THREE.MeshPhongMaterial({ map: texture });
-		var geometry = new THREE.SphereGeometry(radius, segment, segment);
-		_marble1.mesh = new THREE.Mesh(geometry, material);
-		_marble1.mesh.rotation = 0;
+		_marble1.Init(texture);
 		_marble1.mesh.position.x = 0.5;
-		_marble1.mesh.position.y = radius;
-		_scene.add(_marble1.mesh);
 	});
 
+	_marble2 = new Marble(_scene, 'images/texture2.png');
 	texLoader.load(_marble2.textureName, function(texture) {
-		var material = new THREE.MeshPhongMaterial({ map: texture });
-		var geometry = new THREE.SphereGeometry(radius, segment, segment);
-		_marble2.mesh = new THREE.Mesh(geometry, material);
-		_marble2.mesh.rotation = 0;
+		_marble2.Init(texture);
 		_marble2.mesh.position.x = -0.5;
-		_marble2.mesh.position.y = radius;
-		_scene.add(_marble2.mesh);
 	});
 
-	// My race track!
-	var geom = new THREE.Geometry();
-	var v = [];
-	var index = 0;
-	var h = 0;
+	var rt = new RaceTrack(_scene);
+	rt.Init();
 
-	v[index] = new THREE.Vector3(-0.5, h, 0);
-	index++;
-	v[index] = new THREE.Vector3(0.5, h, 0);
-	index++;
-
-	for (var i = 0; i < 20; i++)
-	{
-		var t = -1 - i * 0.05;
-		h = Math.sin(Math.PI*i*0.05*0.5);
-		v[index] = new THREE.Vector3(2.5*Math.cos(Math.PI*t)+2, h, -1*(2.5*Math.sin(Math.PI*t)+4));
-		index++;
-		v[index] = new THREE.Vector3(1.5*Math.cos(Math.PI*t)+2, 0, -1*(1.5*Math.sin(Math.PI*t)+4));
-		index++;
-	}
-
-	for (var i = 0; i < 20; i++)
-	{
-		var t = -i * 0.05;
-		h = Math.cos(Math.PI*t*0.5);
-		v[index] = new THREE.Vector3(1.5*Math.cos(Math.PI*t)+3, h, -1*(1.5*Math.sin(Math.PI*t)+4));
-		index++;
-		v[index] = new THREE.Vector3(0.5*Math.cos(Math.PI*t)+3, 0, -1*(0.5*Math.sin(Math.PI*t)+4));
-		index++;
-	}
-
-	for (var i = 0; i < 20; i++)
-	{
-		var t = i * 0.05;
-		h = 0.25*Math.sin(Math.PI*t*0.5);
-		v[index] = new THREE.Vector3(1.5, 0, -4.0);
-		index++;
-		v[index] = new THREE.Vector3(1*Math.cos(Math.PI*t)+1.5, h, -1*(1*Math.sin(Math.PI*t)+4));
-		index++;
-	}
-
-	v[index] = new THREE.Vector3(1.5, 0, -1);
-	index++;
-	v[index] = new THREE.Vector3(0.5, h, -1);
-	index++;
-
-	for (var i = 0; i < 20; i++)
-	{
-		var t = 1 + i * 0.05;
-		h = 0.25*Math.sin(Math.PI*t*0.5);
-		v[index] = new THREE.Vector3(1.5, 0, -1.0);
-		index++;
-		v[index] = new THREE.Vector3(1*Math.cos(Math.PI*t)+1.5, h, -1*(1*Math.sin(Math.PI*t)+1));
-		index++;
-	}
-
-	for (var i = 0; i < 20; i++)
-	{
-		var t = -1 - i * 0.05;
-		h = 0.5*Math.sin(Math.PI*i*0.05*0.5);
-		v[index] = new THREE.Vector3(1*Math.cos(Math.PI*t)+2.5, h, -1*(1*Math.sin(Math.PI*t)+1));
-		index++;
-		v[index] = new THREE.Vector3(2.5, 0, -1);
-		index++;
-	}
-
-	v[index] = new THREE.Vector3(3.5, h, 0);
-	index++;
-	v[index] = new THREE.Vector3(2.5, 0, 0);
-	index++;
-
-	for (var i = 0; i <= 20; i++) // Include the starting point
-	{
-		var t = -i * 0.05;
-		h = 0.5*Math.cos(Math.PI*t*0.5);
-		v[index] = new THREE.Vector3(2*Math.cos(Math.PI*t)+1.5, h, -1*(2*Math.sin(Math.PI*t)));
-		index++;
-		v[index] = new THREE.Vector3(1*Math.cos(Math.PI*t)+1.5, 0, -1*(1*Math.sin(Math.PI*t)));
-		index++;
-	}
-
-	for (var i = 0; i < index; i++)
-	{
-		geom.vertices.push(v[i]);
-	}
-
-	for (var i = 0; i < index - 2; i += 2)
-	{
-		geom.faces.push(new THREE.Face3(i, i + 1, i + 2));
-		geom.faces.push(new THREE.Face3(i + 3, i + 2, i + 1));
-	}
-
-	geom.computeFaceNormals();
-
-	var mat1 = new THREE.MeshBasicMaterial( { color: 0xffcccc } );
-	var mat2 = new THREE.MeshNormalMaterial();
-	var mat3 = new THREE.MeshLambertMaterial();
-	var object = new THREE.Mesh(geom, mat2);
-
-	//var wireframe = new THREE.WireframeHelper( object, 0xee0000 );
-	var wireframe = new THREE.WireframeGeometry(geom);
-
-	var group = new THREE.Group();
-	group.scale.multiplyScalar(2);
-	_scene.add(group);
-
-	// To make sure that the matrixWorld is up to date for the boxhelpers
-	group.updateMatrixWorld(true);
-	var line = new THREE.LineSegments(wireframe);
-	line.material.depthTest = false;
-	line.material.opacity = 0.25;
-	line.material.transparent = true;
-	//line.position.x = 0.2;
-	//line.position.y = 0.2;
-	group.add(line);
-	group.add(object);
-	//_scene.add(new THREE.BoxHelper(line));
-
-	// A silly cube
-	var material = new THREE.MeshPhongMaterial({ color: 0xffcccc });
-	var geometry = new THREE.CubeGeometry(1, 1, 1); 
-	var cubeMesh = new THREE.Mesh(geometry, material); 
-	cubeMesh.rotation.x = Math.PI / 5; 
-	cubeMesh.rotation.y = Math.PI / 5; 
-	cubeMesh.position.x = 0;
-	cubeMesh.position.y = 0;
-	cubeMesh.position.z = -1.0;
-	_scene.add(cubeMesh);
+	var cube = new RandomCube(_scene);
+	cube.Init();
 
 	// Don't need to render here. (Textures are not loaded at this point anyway.)
 	_renderer.render(_scene, _camera);
+}
+
+function onKeyUpFunc(e)
+{
+	var key = e.keyCode ? e.keyCode : e.which;
+	if (key == 38)
+		_cameraPos.z -= 0.01;
+	else if (key == 40)
+		_cameraPos.z += 0.01;
+	else if (key == 37)
+		_cameraPos.x -= 0.01;
+	else if (key == 39)
+		_cameraPos.x += 0.01;
+	updateStatus();
 }
 
 function scanGamepads()
@@ -353,6 +237,10 @@ function run()
 	window.addEventListener("load", function() {
 		onLoadFunc();
 	});
+
+	window.onkeyup = function(e) {
+		onKeyUpFunc(e);
+	}
 
 	var haveEvents = 'GamepadEvent' in window;
 	if (haveEvents)
