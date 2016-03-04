@@ -123,3 +123,69 @@ RaceTrack.prototype.Init = function()
 	group.add(object);
 	//_scene.add(new THREE.BoxHelper(line));
 }
+
+RaceTrack.prototype.GetCameraPos = function(t)
+{
+	var y = 1.3333;
+	var delay = 3.3333;
+	return this.GetPos(t, y, delay)
+}
+
+RaceTrack.prototype.GetFocusPos = function(t)
+{
+	var y = 0;
+	var delay = 0;
+	return this.GetPos(t, y, delay)
+}
+
+RaceTrack.prototype.GetPos = function(t, y, delay)
+{
+	t -= delay;
+
+	if (t < 0 + 8)
+	{
+		return new THREE.Vector3(0, y, -t);
+	}
+	else if (t < 8 + 9)
+	{
+		var theta = -1 - (t - 8) / 9.0;
+		return new THREE.Vector3(4*Math.cos(Math.PI*theta)+4, y, -1*(4*Math.sin(Math.PI*theta)+8));
+	}
+	else if (t < 17 + 6)
+	{
+		var theta = -(t - 17) / 6.0;
+		return new THREE.Vector3(2*Math.cos(Math.PI*theta)+6, y, -1*(2*Math.sin(Math.PI*theta)+8));
+	}
+	else if (t < 23 + 4)
+	{
+		var theta = (t - 23 ) / 4.0;
+		return new THREE.Vector3(1*Math.cos(Math.PI*theta)+3, y, -1*(1*Math.sin(Math.PI*theta)+8));
+	}
+	else if (t < 27 + 6)
+	{
+		return new THREE.Vector3(2, y, -2 - (6 - (t - 27)));
+	}
+	else if (t < 33 + 4)
+	{
+		var theta = 1 + (t - 33) / 4.0;
+		return new THREE.Vector3(1*Math.cos(Math.PI*theta)+3, y, -1*(1*Math.sin(Math.PI*theta)+2));
+	}
+	else if (t < 37 + 4)
+	{
+		var theta = -1 - (t - 37) / 4.0;
+		return new THREE.Vector3(1*Math.cos(Math.PI*theta)+5, y, -1*(1*Math.sin(Math.PI*theta)+2));
+	}
+	else if (t < 41 + 1)
+	{
+		return new THREE.Vector3(6, y, -(2 - 2 * (t - 41)));
+	}
+	else if (t < 42 + 6)
+	{
+		var theta = -(t - 42) / 6.0;
+		return new THREE.Vector3(3*Math.cos(Math.PI*theta)+3, y, -1*(3*Math.sin(Math.PI*theta)));
+	}
+	else
+	{
+		return null;
+	}
+}

@@ -71,6 +71,9 @@ var _gamepad2;
 var _marble1; // = { textureName: 'images/texture1.png', mesh: null };
 var _marble2; // = { textureName: 'images/texture2.png', mesh: null };
 
+var _raceTrack;
+var _run = false;
+var _time = 0;
 
 function onLoadFunc() 
 {
@@ -110,8 +113,8 @@ function onLoadFunc()
 		_marble2.mesh.position.x = -0.5;
 	});
 
-	var rt = new RaceTrack(_scene);
-	rt.Init();
+	_raceTrack = new RaceTrack(_scene);
+	_raceTrack.Init();
 
 	var cube = new RandomCube(_scene);
 	cube.Init();
@@ -123,13 +126,15 @@ function onLoadFunc()
 function onKeyUpFunc(e)
 {
 	var key = e.keyCode ? e.keyCode : e.which;
-	if (key == 38)
+	if (key == 32) // Space key
+		_run = true;
+	else if (key == 38) // Up
 		_cameraPos.z -= 0.01;
-	else if (key == 40)
+	else if (key == 40) // Down
 		_cameraPos.z += 0.01;
-	else if (key == 37)
+	else if (key == 37) // Left
 		_cameraPos.x -= 0.01;
-	else if (key == 39)
+	else if (key == 39) // Right
 		_cameraPos.x += 0.01;
 	updateStatus();
 }
@@ -199,8 +204,28 @@ function updateStatus()
 	updatePlayer(_gamepad1, _marble1);
 	updatePlayer(_gamepad2, _marble2);
 
-	_camera.position.set(_cameraPos.x, _cameraPos.y, _cameraPos.z);
-	_camera.lookAt(_marble1.mesh.position)
+	if (_run)
+	{
+		_time += 0.01;
+		var camPosition = _raceTrack.GetCameraPos(_time);
+		var camFocus = _raceTrack.GetFocusPos(_time);
+		if (camFocus == null || camPosition == null)
+		{
+			_run = false;
+			_time = 0;
+		}
+		else
+		{
+			_camera.position.set(camPosition.x, camPosition.y, camPosition.z);
+			_camera.lookAt(camFocus);
+		}
+	}
+	else
+	{
+		_camera.position.set(_cameraPos.x, _cameraPos.y, _cameraPos.z);
+		_camera.lookAt(_marble1.mesh.position)
+	}
+
 	_renderer.render(_scene, _camera);
 
 	_rAF(updateStatus)
