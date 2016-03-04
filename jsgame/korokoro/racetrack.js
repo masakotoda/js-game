@@ -142,46 +142,67 @@ RaceTrack.prototype.GetPos = function(t, y, delay)
 {
 	t -= delay;
 
-	if (t < 0 + 8)
+	var distances = [];
+	distances[0] = 8.0;
+	distances[1] = 4*Math.PI;
+	distances[2] = 2*Math.PI;
+	distances[3] = 1*Math.PI;
+	distances[4] = 6.0;
+	distances[5] = 1*Math.PI;
+	distances[6] = 1*Math.PI;
+	distances[7] = 2;
+	distances[8] = 3*Math.PI;
+
+	var accum = [];
+	for (var i = 0; i < distances.length; i++)
+	{
+		accum[i] = 0;
+		for (var j = 0; j < i; j++)
+		{
+			accum[i] += distances[j];
+		}
+	}
+
+	if (t < accum[0] + distances[0])
 	{
 		return new THREE.Vector3(0, y, -t);
 	}
-	else if (t < 8 + 9)
+	else if (t < accum[1] + distances[1])
 	{
-		var theta = -1 - (t - 8) / 9.0;
+		var theta = -1 - (t - accum[1]) / distances[1];
 		return new THREE.Vector3(4*Math.cos(Math.PI*theta)+4, y, -1*(4*Math.sin(Math.PI*theta)+8));
 	}
-	else if (t < 17 + 6)
+	else if (t < accum[2] + distances[2])
 	{
-		var theta = -(t - 17) / 6.0;
+		var theta = -(t - accum[2]) / distances[2];
 		return new THREE.Vector3(2*Math.cos(Math.PI*theta)+6, y, -1*(2*Math.sin(Math.PI*theta)+8));
 	}
-	else if (t < 23 + 4)
+	else if (t < accum[3] + distances[3])
 	{
-		var theta = (t - 23 ) / 4.0;
+		var theta = (t - accum[3]) / distances[3];
 		return new THREE.Vector3(1*Math.cos(Math.PI*theta)+3, y, -1*(1*Math.sin(Math.PI*theta)+8));
 	}
-	else if (t < 27 + 6)
+	else if (t < accum[4] + distances[4])
 	{
-		return new THREE.Vector3(2, y, -2 - (6 - (t - 27)));
+		return new THREE.Vector3(2, y, -2 - (distances[4] - (t - accum[4])));
 	}
-	else if (t < 33 + 4)
+	else if (t < accum[5] + distances[5])
 	{
-		var theta = 1 + (t - 33) / 4.0;
+		var theta = 1 + (t - accum[5]) / distances[5];
 		return new THREE.Vector3(1*Math.cos(Math.PI*theta)+3, y, -1*(1*Math.sin(Math.PI*theta)+2));
 	}
-	else if (t < 37 + 4)
+	else if (t < accum[6] + distances[6])
 	{
-		var theta = -1 - (t - 37) / 4.0;
+		var theta = -1 - (t - accum[6]) / distances[6];
 		return new THREE.Vector3(1*Math.cos(Math.PI*theta)+5, y, -1*(1*Math.sin(Math.PI*theta)+2));
 	}
-	else if (t < 41 + 1)
+	else if (t < accum[7] + distances[7])
 	{
-		return new THREE.Vector3(6, y, -(2 - 2 * (t - 41)));
+		return new THREE.Vector3(6, y, -(distances[7] - (t - accum[7])));
 	}
-	else if (t < 42 + 6)
+	else if (t < accum[8] + distances[8])
 	{
-		var theta = -(t - 42) / 6.0;
+		var theta = -(t - accum[8]) / distances[8];
 		return new THREE.Vector3(3*Math.cos(Math.PI*theta)+3, y, -1*(3*Math.sin(Math.PI*theta)));
 	}
 	else
