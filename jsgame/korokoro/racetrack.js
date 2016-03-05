@@ -2,6 +2,8 @@
 function RaceTrack(scene)
 {
 	this.scene = scene;
+	this.object = null;
+	this.raycaster = new THREE.Raycaster();
 }
 
 RaceTrack.prototype.Init = function()
@@ -99,10 +101,12 @@ RaceTrack.prototype.Init = function()
 
 	geom.computeFaceNormals();
 
-	var mat1 = new THREE.MeshBasicMaterial( { color: 0xffcccc } );
-	var mat2 = new THREE.MeshNormalMaterial();
-	var mat3 = new THREE.MeshLambertMaterial();
-	var object = new THREE.Mesh(geom, mat2);
+	//var mat0 = new THREE.MeshBasicMaterial( { transparent: true, opacity: 0 } );
+	//var mat1 = new THREE.MeshBasicMaterial( { color: 0xffcccc } );
+	//var mat2 = new THREE.MeshNormalMaterial();
+	//var mat3 = new THREE.MeshLambertMaterial();
+	var mat4 = new THREE.MeshPhongMaterial( { color: 0x333340 } );
+	this.object = new THREE.Mesh(geom, mat4);
 
 	//var wireframe = new THREE.WireframeHelper( object, 0xee0000 );
 	var wireframe = new THREE.WireframeGeometry(geom);
@@ -114,13 +118,24 @@ RaceTrack.prototype.Init = function()
 	// To make sure that the matrixWorld is up to date for the boxhelpers
 	group.updateMatrixWorld(true);
 	var line = new THREE.LineSegments(wireframe);
+	line.material = new THREE.MeshBasicMaterial( { color: 0xffcccc } );
 	line.material.depthTest = false;
 	line.material.opacity = 0.25;
 	line.material.transparent = true;
+
 	//line.position.x = 0.2;
 	//line.position.y = 0.2;
 	group.add(line);
-	group.add(object);
+	group.add(this.object);
+
+	// Some cool vertical line on faces
+	//var fnh = new THREE.FaceNormalsHelper(this.object, 1);
+	//this.scene.add(fnh);
+
+	// Some cool vertical line on faces
+	//var vnh = new THREE.VertexNormalsHelper(this.object, 5);
+	//this.scene.add(vnh);
+
 	//_scene.add(new THREE.BoxHelper(line));
 }
 
@@ -136,6 +151,18 @@ RaceTrack.prototype.GetFocusPos = function(t)
 	var y = 0;
 	var delay = 0;
 	return this.GetPos(t, y, delay)
+}
+
+RaceTrack.prototype.GetIntersectY = function(x, z)
+{
+	var y = 0;
+	this.raycaster.set(new THREE.Vector3(x, 10, z), new THREE.Vector3(0, -1, 0));
+	var intersects = this.raycaster.intersectObjects([this.object]);
+	if (intersects.length > 0)
+	{
+		y = intersects[0].point.y;
+	}
+	return y;
 }
 
 RaceTrack.prototype.GetPos = function(t, y, delay)
@@ -165,45 +192,81 @@ RaceTrack.prototype.GetPos = function(t, y, delay)
 
 	if (t < accum[0] + distances[0])
 	{
-		return new THREE.Vector3(0, y, -t);
+		var x = 0;
+		var z = -t;
+		if (delay == 0)
+			y = this.GetIntersectY(x, z);
+		return new THREE.Vector3(x, y, z);
 	}
 	else if (t < accum[1] + distances[1])
 	{
 		var theta = -1 - (t - accum[1]) / distances[1];
-		return new THREE.Vector3(4*Math.cos(Math.PI*theta)+4, y, -1*(4*Math.sin(Math.PI*theta)+8));
+		var x = 4*Math.cos(Math.PI*theta)+4;
+		var z = -1*(4*Math.sin(Math.PI*theta)+8);
+		if (delay == 0)
+			y = this.GetIntersectY(x, z);
+		return new THREE.Vector3(x, y, z);
 	}
 	else if (t < accum[2] + distances[2])
 	{
 		var theta = -(t - accum[2]) / distances[2];
-		return new THREE.Vector3(2*Math.cos(Math.PI*theta)+6, y, -1*(2*Math.sin(Math.PI*theta)+8));
+		var x = 2*Math.cos(Math.PI*theta)+6;
+		var z = -1*(2*Math.sin(Math.PI*theta)+8);
+		if (delay == 0)
+			y = this.GetIntersectY(x, z);
+		return new THREE.Vector3(x, y, z);
 	}
 	else if (t < accum[3] + distances[3])
 	{
 		var theta = (t - accum[3]) / distances[3];
-		return new THREE.Vector3(1*Math.cos(Math.PI*theta)+3, y, -1*(1*Math.sin(Math.PI*theta)+8));
+		var x = 1*Math.cos(Math.PI*theta)+3;
+		var z = -1*(1*Math.sin(Math.PI*theta)+8);
+		if (delay == 0)
+			y = this.GetIntersectY(x, z);
+		return new THREE.Vector3(x, y, z);
 	}
 	else if (t < accum[4] + distances[4])
 	{
-		return new THREE.Vector3(2, y, -2 - (distances[4] - (t - accum[4])));
+		var x = 2;
+		var z = -2 - (distances[4] - (t - accum[4]));
+		if (delay == 0)
+			y = this.GetIntersectY(x, z);
+		return new THREE.Vector3(x, y, z);
 	}
 	else if (t < accum[5] + distances[5])
 	{
 		var theta = 1 + (t - accum[5]) / distances[5];
-		return new THREE.Vector3(1*Math.cos(Math.PI*theta)+3, y, -1*(1*Math.sin(Math.PI*theta)+2));
+		var x = 1*Math.cos(Math.PI*theta)+3;
+		var z = -1*(1*Math.sin(Math.PI*theta)+2);
+		if (delay == 0)
+			y = this.GetIntersectY(x, z);
+		return new THREE.Vector3(x, y, z);
 	}
 	else if (t < accum[6] + distances[6])
 	{
 		var theta = -1 - (t - accum[6]) / distances[6];
-		return new THREE.Vector3(1*Math.cos(Math.PI*theta)+5, y, -1*(1*Math.sin(Math.PI*theta)+2));
+		var x = 1*Math.cos(Math.PI*theta)+5;
+		var z = -1*(1*Math.sin(Math.PI*theta)+2);
+		if (delay == 0)
+			y = this.GetIntersectY(x, z);
+		return new THREE.Vector3(x, y, z);
 	}
 	else if (t < accum[7] + distances[7])
 	{
-		return new THREE.Vector3(6, y, -(distances[7] - (t - accum[7])));
+		var x = 6;
+		var z = -(distances[7] - (t - accum[7]));
+		if (delay == 0)
+			y = this.GetIntersectY(x, z);
+		return new THREE.Vector3(x, y, z);
 	}
 	else if (t < accum[8] + distances[8])
 	{
 		var theta = -(t - accum[8]) / distances[8];
-		return new THREE.Vector3(3*Math.cos(Math.PI*theta)+3, y, -1*(3*Math.sin(Math.PI*theta)));
+		var x = 3*Math.cos(Math.PI*theta)+3;
+		var z = -1*(3*Math.sin(Math.PI*theta));
+		if (delay == 0)
+			y = this.GetIntersectY(x, z);
+		return new THREE.Vector3(x, y, z);
 	}
 	else
 	{

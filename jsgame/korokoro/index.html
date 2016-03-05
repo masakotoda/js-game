@@ -95,7 +95,7 @@ function onLoadFunc()
 
 	// Create a directional light to show off the object 
 	var light = new THREE.DirectionalLight(0xffffff, 1.5); 
-	light.position.set(0, 0, 1);
+	light.position.set(0, 1, 0);
 	_scene.add(light); 
 
 	// Create a shaded, texture-mapped cube, objects and add them to the scene 
@@ -116,8 +116,8 @@ function onLoadFunc()
 	_raceTrack = new RaceTrack(_scene);
 	_raceTrack.Init();
 
-	var cube = new RandomCube(_scene);
-	cube.Init();
+	//var cube = new RandomCube(_scene);
+	//cube.Init();
 
 	// Don't need to render here. (Textures are not loaded at this point anyway.)
 	_renderer.render(_scene, _camera);
@@ -218,6 +218,10 @@ function updateStatus()
 		{
 			_camera.position.set(camPosition.x, camPosition.y, camPosition.z);
 			_camera.lookAt(camFocus);
+			_marble1.mesh.rotation.x -= 0.05;
+			_marble1.mesh.position.x = camFocus.x;
+			_marble1.mesh.position.y = camFocus.y;
+			_marble1.mesh.position.z = camFocus.z;
 		}
 	}
 	else
