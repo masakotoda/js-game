@@ -209,7 +209,8 @@ function updateStatus()
 		_time += 0.01;
 		var camPosition = _raceTrack.GetCameraPos(_time);
 		var camFocus = _raceTrack.GetFocusPos(_time);
-		if (camFocus == null || camPosition == null)
+		var ballPos = _raceTrack.GetBallPos(_time, 0.25);
+		if (camFocus == null || camPosition == null || ballPos == null)
 		{
 			_run = false;
 			_time = 0;
@@ -219,9 +220,9 @@ function updateStatus()
 			_camera.position.set(camPosition.x, camPosition.y, camPosition.z);
 			_camera.lookAt(camFocus);
 			_marble1.mesh.rotation.x -= 0.05;
-			_marble1.mesh.position.x = camFocus.x;
-			_marble1.mesh.position.y = camFocus.y;
-			_marble1.mesh.position.z = camFocus.z;
+			_marble1.mesh.position.x = ballPos.x;
+			_marble1.mesh.position.y = ballPos.y;
+			_marble1.mesh.position.z = ballPos.z;
 		}
 	}
 	else
