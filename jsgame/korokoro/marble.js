@@ -16,5 +16,7 @@ Marble.prototype.Init = function(texture)
 	this.mesh.rotation = 0;
 	this.mesh.position.x = 0;
 	this.mesh.position.y = radius;
+	this.mesh.castShadow = true;
+	this.mesh.receiveShadow = false;
 	this.scene.add(this.mesh);
 }
