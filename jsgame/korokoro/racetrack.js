@@ -11,80 +11,136 @@ RaceTrack.prototype.Init = function()
 	var geom = new THREE.Geometry();
 	var v = [];
 	var index = 0;
-	var h = 0;
 
-	v[index] = new THREE.Vector3(-0.5, h, 0);
+	var h0 = 0;
+	var h1 = 0;
+	var delta = 0;
+	var h_outer = h0;
+	var h_inner = h0;
+
+	v[index] = new THREE.Vector3(-0.5, h_outer, 0);
 	index++;
-	v[index] = new THREE.Vector3(0.5, h, 0);
+	v[index] = new THREE.Vector3(0.5, h_inner, 0);
 	index++;
+
+	h0 = 0;
+	h1 = 1.0;
+	delta = (h1 - h0) / 20;
+	h0_inner = 0;
+	delta_inner = (1.5 / 2.5) * (h1 - h0) / 20;
 
 	for (var i = 0; i < 20; i++)
 	{
 		var t = -1 - i * 0.05;
-		h = Math.sin(Math.PI*i*0.05*0.5);
-		v[index] = new THREE.Vector3(2.5*Math.cos(Math.PI*t)+2, h, -1*(2.5*Math.sin(Math.PI*t)+4));
+		h_outer = h0 + delta * i;
+		h_inner = h0_inner + delta_inner * i;
+		v[index] = new THREE.Vector3(2.5*Math.cos(Math.PI*t)+2, h_outer, -1*(2.5*Math.sin(Math.PI*t)+4));
 		index++;
-		v[index] = new THREE.Vector3(1.5*Math.cos(Math.PI*t)+2, 0, -1*(1.5*Math.sin(Math.PI*t)+4));
+		v[index] = new THREE.Vector3(1.5*Math.cos(Math.PI*t)+2, h_inner, -1*(1.5*Math.sin(Math.PI*t)+4));
 		index++;
 	}
+
+	h0 = h_outer;
+	h1 = h_inner;
+	delta = (h1 - h0) / 20.0;
+	h0_inner = h1;
+	delta_inner = 0;
 
 	for (var i = 0; i < 20; i++)
 	{
 		var t = -i * 0.05;
-		h = Math.cos(Math.PI*t*0.5);
-		v[index] = new THREE.Vector3(1.5*Math.cos(Math.PI*t)+3, h, -1*(1.5*Math.sin(Math.PI*t)+4));
+		h_outer = h0 + delta * i;
+		h_inner = h0_inner + delta_inner * i;
+		v[index] = new THREE.Vector3(1.5*Math.cos(Math.PI*t)+3, h_outer, -1*(1.5*Math.sin(Math.PI*t)+4));
 		index++;
-		v[index] = new THREE.Vector3(0.5*Math.cos(Math.PI*t)+3, 0, -1*(0.5*Math.sin(Math.PI*t)+4));
+		v[index] = new THREE.Vector3(0.5*Math.cos(Math.PI*t)+3, h_inner, -1*(0.5*Math.sin(Math.PI*t)+4));
 		index++;
 	}
+
+	h0 = h_outer;
+	h1 = h_inner + 0.25;
+	delta = (h1 - h0) / 20.0;
+	h0_inner = h0;
+	delta_inner = 0;
 
 	for (var i = 0; i < 20; i++)
 	{
 		var t = i * 0.05;
-		h = 0.25*Math.sin(Math.PI*t*0.5);
-		v[index] = new THREE.Vector3(1.5, 0, -4.0);
+		h_outer = h0 + delta * i;
+		h_inner = h0_inner + delta_inner * i;
+		v[index] = new THREE.Vector3(1.5, h_inner, -4.0);
 		index++;
-		v[index] = new THREE.Vector3(1*Math.cos(Math.PI*t)+1.5, h, -1*(1*Math.sin(Math.PI*t)+4));
+		v[index] = new THREE.Vector3(1*Math.cos(Math.PI*t)+1.5, h_outer, -1*(1*Math.sin(Math.PI*t)+4));
 		index++;
 	}
 
-	v[index] = new THREE.Vector3(1.5, 0, -1);
+	h_outer = 0.25;
+	h_inner = 0.0;
+	v[index] = new THREE.Vector3(1.5, h_inner, -1);
 	index++;
-	v[index] = new THREE.Vector3(0.5, h, -1);
+	v[index] = new THREE.Vector3(0.5, h_outer, -1);
 	index++;
+
+	h0 = h_outer;
+	h1 = 0;
+	delta = (h1 - h0) / 20.0;
+	h0_inner = 0;
+	delta_inner = 0;
 
 	for (var i = 0; i < 20; i++)
 	{
 		var t = 1 + i * 0.05;
-		h = 0.25*Math.sin(Math.PI*t*0.5);
-		v[index] = new THREE.Vector3(1.5, 0, -1.0);
+		h_outer = h0 + delta * i;
+		h_inner = h0_inner + delta_inner * i;
+		v[index] = new THREE.Vector3(1.5, h_inner, -1.0);
 		index++;
-		v[index] = new THREE.Vector3(1*Math.cos(Math.PI*t)+1.5, h, -1*(1*Math.sin(Math.PI*t)+1));
+		v[index] = new THREE.Vector3(1*Math.cos(Math.PI*t)+1.5, h_outer, -1*(1*Math.sin(Math.PI*t)+1));
 		index++;
 	}
+
+	h_outer = 0;
+	h_inner = 0;
+	v[index] = new THREE.Vector3(1.5, h_inner, -1.5);
+	index++;
+	v[index] = new THREE.Vector3(2.5, h_outer, -1.5);
+	index++;
+
+	h0 = h_inner;
+	h1 = h_outer + 0.25;
+	delta = (h1 - h0) / 20.0;
+	h0_inner = h0;
+	delta_inner = 0;
 
 	for (var i = 0; i < 20; i++)
 	{
 		var t = -1 - i * 0.05;
-		h = 0.5*Math.sin(Math.PI*i*0.05*0.5);
-		v[index] = new THREE.Vector3(1*Math.cos(Math.PI*t)+2.5, h, -1*(1*Math.sin(Math.PI*t)+1));
+		h_outer = h0 + delta * i;
+		h_inner = h0_inner + delta_inner * i;
+		v[index] = new THREE.Vector3(1*Math.cos(Math.PI*t)+2.5, h_outer, -1*(1*Math.sin(Math.PI*t)+1.5));
 		index++;
-		v[index] = new THREE.Vector3(2.5, 0, -1);
+		v[index] = new THREE.Vector3(2.5, h_inner, -1.5);
 		index++;
 	}
 
-	v[index] = new THREE.Vector3(3.5, h, 0);
+	v[index] = new THREE.Vector3(3.5, h_outer, 0);
 	index++;
-	v[index] = new THREE.Vector3(2.5, 0, 0);
+	v[index] = new THREE.Vector3(2.5, h_inner, 0);
 	index++;
+
+	h0 = h_outer;
+	h1 = 0;
+	delta = (h1 - h0) / 20.0;
+	h0_inner = h_inner;
+	delta_inner = (0 - h_inner) /20.0;
 
 	for (var i = 0; i <= 20; i++) // Include the starting point
 	{
 		var t = -i * 0.05;
-		h = 0.5*Math.cos(Math.PI*t*0.5);
-		v[index] = new THREE.Vector3(2*Math.cos(Math.PI*t)+1.5, h, -1*(2*Math.sin(Math.PI*t)));
+		h_outer = h0 + delta * i;
+		h_inner = h0_inner + delta_inner * i;
+		v[index] = new THREE.Vector3(2*Math.cos(Math.PI*t)+1.5, h_outer, -1*(2*Math.sin(Math.PI*t)));
 		index++;
-		v[index] = new THREE.Vector3(1*Math.cos(Math.PI*t)+1.5, 0, -1*(1*Math.sin(Math.PI*t)));
+		v[index] = new THREE.Vector3(1*Math.cos(Math.PI*t)+1.5, h_inner, -1*(1*Math.sin(Math.PI*t)));
 		index++;
 	}
 
@@ -141,7 +197,7 @@ RaceTrack.prototype.Init = function()
 
 RaceTrack.prototype.GetCameraPos = function(t)
 {
-	var y = 1.3333;
+	var y = 2.3333;
 	var delay = 3.3333;
 	var radius = 0;
 	return this.GetPos(t, y, radius, delay)
@@ -202,9 +258,10 @@ RaceTrack.prototype.GetPos = function(t, y, radius, delay)
 	distances[3] = 1*Math.PI;
 	distances[4] = 6.0;
 	distances[5] = 1*Math.PI;
-	distances[6] = 1*Math.PI;
-	distances[7] = 2;
-	distances[8] = 3*Math.PI;
+	distances[6] = 1;
+	distances[7] = 1*Math.PI;
+	distances[8] = 3;
+	distances[9] = 3*Math.PI;
 
 	var accum = [];
 	for (var i = 0; i < distances.length; i++)
@@ -276,9 +333,8 @@ RaceTrack.prototype.GetPos = function(t, y, radius, delay)
 	}
 	else if (t < accum[6] + distances[6])
 	{
-		var theta = -1 - (t - accum[6]) / distances[6];
-		var x = 1*Math.cos(Math.PI*theta)+5;
-		var z = -1*(1*Math.sin(Math.PI*theta)+2);
+		var x = 4;
+		var z = - (t - accum[6] + 2);
 		if (delay == 0)
 			return this.GetVertex(x, z, radius);
 		else
@@ -286,8 +342,9 @@ RaceTrack.prototype.GetPos = function(t, y, radius, delay)
 	}
 	else if (t < accum[7] + distances[7])
 	{
-		var x = 6;
-		var z = -(distances[7] - (t - accum[7]));
+		var theta = -1 - (t - accum[7]) / distances[7];
+		var x = 1*Math.cos(Math.PI*theta)+5;
+		var z = -1*(1*Math.sin(Math.PI*theta)+3);
 		if (delay == 0)
 			return this.GetVertex(x, z, radius);
 		else
@@ -295,7 +352,16 @@ RaceTrack.prototype.GetPos = function(t, y, radius, delay)
 	}
 	else if (t < accum[8] + distances[8])
 	{
-		var theta = -(t - accum[8]) / distances[8];
+		var x = 6;
+		var z = -(distances[8] - (t - accum[8]));
+		if (delay == 0)
+			return this.GetVertex(x, z, radius);
+		else
+			return new THREE.Vector3(x, y, z);
+	}
+	else if (t < accum[9] + distances[9])
+	{
+		var theta = -(t - accum[9]) / distances[9];
 		var x = 3*Math.cos(Math.PI*theta)+3;
 		var z = -1*(3*Math.sin(Math.PI*theta));
 		if (delay == 0)
