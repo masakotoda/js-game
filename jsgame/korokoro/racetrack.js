@@ -212,7 +212,8 @@ RaceTrack.prototype.GetCameraPos = function(t)
 	var y = 2.3333;
 	var delay = 3.3333;
 	var radius = 0;
-	return this.GetPos(t, y, radius, delay)
+	var offset = 0;
+	return this.GetPos(t, y, radius, delay, offset);
 }
 
 RaceTrack.prototype.GetFocusPos = function(t)
@@ -220,14 +221,15 @@ RaceTrack.prototype.GetFocusPos = function(t)
 	var y = 0;
 	var delay = 0;
 	var radius = 0;
-	return this.GetPos(t, y, radius, delay)
+	var offset = 0;
+	return this.GetPos(t, y, radius, delay, offset);
 }
 
-RaceTrack.prototype.GetBallPos = function(t, radius)
+RaceTrack.prototype.GetBallPos = function(t, radius, offset)
 {
 	var y = 0;
 	var delay = 0;
-	return this.GetPos(t, y, radius, delay)
+	return this.GetPos(t, y, radius, delay, offset);
 }
 
 RaceTrack.prototype.GetIntersect = function(x, z)
@@ -239,7 +241,6 @@ RaceTrack.prototype.GetIntersect = function(x, z)
 		return intersects[0];
 	}
 	return null;
-	return y;
 }
 
 RaceTrack.prototype.GetVertex = function(x, z, radius)
@@ -259,7 +260,7 @@ RaceTrack.prototype.GetVertex = function(x, z, radius)
 	}
 }
 
-RaceTrack.prototype.GetPos = function(t, y, radius, delay)
+RaceTrack.prototype.GetPos = function(t, y, radius, delay, offset)
 {
 	t -= delay;
 
@@ -289,7 +290,7 @@ RaceTrack.prototype.GetPos = function(t, y, radius, delay)
 	{
 		if (t < accum[0] + distances[0])
 		{
-			var x = 0;
+			var x = offset;
 			var z = -t;
 			if (delay == 0)
 				return this.GetVertex(x, z, radius);
@@ -299,8 +300,9 @@ RaceTrack.prototype.GetPos = function(t, y, radius, delay)
 		else if (t < accum[1] + distances[1])
 		{
 			var theta = -1 - (t - accum[1]) / distances[1];
-			var x = 4*Math.cos(Math.PI*theta)+4;
-			var z = -1*(4*Math.sin(Math.PI*theta)+8);
+			var r = (4 - offset);
+			var x = r*Math.cos(Math.PI*theta)+4;
+			var z = -1*(r*Math.sin(Math.PI*theta)+8);
 			if (delay == 0)
 				return this.GetVertex(x, z, radius);
 			else
@@ -309,8 +311,9 @@ RaceTrack.prototype.GetPos = function(t, y, radius, delay)
 		else if (t < accum[2] + distances[2])
 		{
 			var theta = -(t - accum[2]) / distances[2];
-			var x = 2*Math.cos(Math.PI*theta)+6;
-			var z = -1*(2*Math.sin(Math.PI*theta)+8);
+			var r = (2 - offset);
+			var x = r*Math.cos(Math.PI*theta)+6;
+			var z = -1*(r*Math.sin(Math.PI*theta)+8);
 			if (delay == 0)
 				return this.GetVertex(x, z, radius);
 			else
@@ -319,8 +322,9 @@ RaceTrack.prototype.GetPos = function(t, y, radius, delay)
 		else if (t < accum[3] + distances[3])
 		{
 			var theta = (t - accum[3]) / distances[3];
-			var x = 1*Math.cos(Math.PI*theta)+3;
-			var z = -1*(1*Math.sin(Math.PI*theta)+8);
+			var r = (1 + offset);
+			var x = r*Math.cos(Math.PI*theta)+3;
+			var z = -1*(r*Math.sin(Math.PI*theta)+8);
 			if (delay == 0)
 				return this.GetVertex(x, z, radius);
 			else
@@ -328,7 +332,7 @@ RaceTrack.prototype.GetPos = function(t, y, radius, delay)
 		}
 		else if (t < accum[4] + distances[4])
 		{
-			var x = 2;
+			var x = 2 - offset;
 			var z = -2 - (distances[4] - (t - accum[4]));
 			if (delay == 0)
 				return this.GetVertex(x, z, radius);
@@ -338,8 +342,9 @@ RaceTrack.prototype.GetPos = function(t, y, radius, delay)
 		else if (t < accum[5] + distances[5])
 		{
 			var theta = 1 + (t - accum[5]) / distances[5];
-			var x = 1*Math.cos(Math.PI*theta)+3;
-			var z = -1*(1*Math.sin(Math.PI*theta)+2);
+			var r = 1 + offset;
+			var x = r*Math.cos(Math.PI*theta)+3;
+			var z = -1*(r*Math.sin(Math.PI*theta)+2);
 			if (delay == 0)
 				return this.GetVertex(x, z, radius);
 			else
@@ -347,7 +352,7 @@ RaceTrack.prototype.GetPos = function(t, y, radius, delay)
 		}
 		else if (t < accum[6] + distances[6])
 		{
-			var x = 4;
+			var x = 4 + offset;
 			var z = - (t - accum[6] + 2);
 			if (delay == 0)
 				return this.GetVertex(x, z, radius);
@@ -357,8 +362,9 @@ RaceTrack.prototype.GetPos = function(t, y, radius, delay)
 		else if (t < accum[7] + distances[7])
 		{
 			var theta = -1 - (t - accum[7]) / distances[7];
-			var x = 1*Math.cos(Math.PI*theta)+5;
-			var z = -1*(1*Math.sin(Math.PI*theta)+3);
+			var r = 1 - offset;
+			var x = r*Math.cos(Math.PI*theta)+5;
+			var z = -1*(r*Math.sin(Math.PI*theta)+3);
 			if (delay == 0)
 				return this.GetVertex(x, z, radius);
 			else
@@ -366,7 +372,7 @@ RaceTrack.prototype.GetPos = function(t, y, radius, delay)
 		}
 		else if (t < accum[8] + distances[8])
 		{
-			var x = 6;
+			var x = 6 - offset;
 			var z = -(distances[8] - (t - accum[8]));
 			if (delay == 0)
 				return this.GetVertex(x, z, radius);
@@ -376,8 +382,9 @@ RaceTrack.prototype.GetPos = function(t, y, radius, delay)
 		else if (t < accum[9] + distances[9])
 		{
 			var theta = -(t - accum[9]) / distances[9];
-			var x = 3*Math.cos(Math.PI*theta)+3;
-			var z = -1*(3*Math.sin(Math.PI*theta));
+			var r = 3 - offset;
+			var x = r*Math.cos(Math.PI*theta)+3;
+			var z = -1*(r*Math.sin(Math.PI*theta));
 			if (delay == 0)
 				return this.GetVertex(x, z, radius);
 			else

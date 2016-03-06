@@ -219,8 +219,8 @@ function updateStatus()
 		_time += 0.05;
 		var camPosition = _raceTrack.GetCameraPos(_time);
 		var camFocus = _raceTrack.GetFocusPos(_time);
-		var ballPos1 = _raceTrack.GetBallPos(_time, 0.16);
-		var ballPos2 = _raceTrack.GetBallPos(_time - 1, 0.16);
+		var ballPos1 = _raceTrack.GetBallPos(_time, 0.16, 0.5);
+		var ballPos2 = _raceTrack.GetBallPos(_time, 0.16, -0.5);
 		if (camFocus == null || camPosition == null)
 		{
 			_run = false;
