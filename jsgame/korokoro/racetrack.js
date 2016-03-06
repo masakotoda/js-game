@@ -1,14 +1,14 @@
 
-function RaceTrack(scene)
+function RaceTrack(scene, sceneTwin)
 {
 	this.scene = scene;
+	this.sceneTwin = sceneTwin;
 	this.object = null;
 	this.raycaster = new THREE.Raycaster();
 }
 
 RaceTrack.prototype.Init = function()
 {
-	var geom = new THREE.Geometry();
 	var v = [];
 	var index = 0;
 
@@ -144,6 +144,7 @@ RaceTrack.prototype.Init = function()
 		index++;
 	}
 
+	var geom = new THREE.Geometry();
 	for (var i = 0; i < index; i++)
 	{
 		geom.vertices.push(v[i]);
@@ -184,7 +185,7 @@ RaceTrack.prototype.Init = function()
 
 	//line.position.x = 0.2;
 	//line.position.y = 0.2;
-	group.add(line);
+	//group.add(line);
 	group.add(this.object);
 
 	// Some cool vertical line on faces
@@ -196,6 +197,14 @@ RaceTrack.prototype.Init = function()
 	//this.scene.add(vnh);
 
 	//_scene.add(new THREE.BoxHelper(line));
+
+	var twin = new THREE.Mesh(geom, new THREE.MeshBasicMaterial( { color: 0xcc0008 } ));
+	twin.position.y = -0.1;
+	var groupTwin = new THREE.Group()
+	groupTwin.add(twin);
+	groupTwin.scale.multiplyScalar(2);
+	this.sceneTwin.add(groupTwin);
+	groupTwin.updateMatrixWorld(true);
 }
 
 RaceTrack.prototype.GetCameraPos = function(t)
@@ -276,104 +285,107 @@ RaceTrack.prototype.GetPos = function(t, y, radius, delay)
 		}
 	}
 
-	if (t < accum[0] + distances[0])
+	while (true)
 	{
-		var x = 0;
-		var z = -t;
-		if (delay == 0)
-			return this.GetVertex(x, z, radius);
+		if (t < accum[0] + distances[0])
+		{
+			var x = 0;
+			var z = -t;
+			if (delay == 0)
+				return this.GetVertex(x, z, radius);
+			else
+				return new THREE.Vector3(x, y, z);
+		}
+		else if (t < accum[1] + distances[1])
+		{
+			var theta = -1 - (t - accum[1]) / distances[1];
+			var x = 4*Math.cos(Math.PI*theta)+4;
+			var z = -1*(4*Math.sin(Math.PI*theta)+8);
+			if (delay == 0)
+				return this.GetVertex(x, z, radius);
+			else
+				return new THREE.Vector3(x, y, z);
+		}
+		else if (t < accum[2] + distances[2])
+		{
+			var theta = -(t - accum[2]) / distances[2];
+			var x = 2*Math.cos(Math.PI*theta)+6;
+			var z = -1*(2*Math.sin(Math.PI*theta)+8);
+			if (delay == 0)
+				return this.GetVertex(x, z, radius);
+			else
+				return new THREE.Vector3(x, y, z);
+		}
+		else if (t < accum[3] + distances[3])
+		{
+			var theta = (t - accum[3]) / distances[3];
+			var x = 1*Math.cos(Math.PI*theta)+3;
+			var z = -1*(1*Math.sin(Math.PI*theta)+8);
+			if (delay == 0)
+				return this.GetVertex(x, z, radius);
+			else
+				return new THREE.Vector3(x, y, z);
+		}
+		else if (t < accum[4] + distances[4])
+		{
+			var x = 2;
+			var z = -2 - (distances[4] - (t - accum[4]));
+			if (delay == 0)
+				return this.GetVertex(x, z, radius);
+			else
+				return new THREE.Vector3(x, y, z);
+		}
+		else if (t < accum[5] + distances[5])
+		{
+			var theta = 1 + (t - accum[5]) / distances[5];
+			var x = 1*Math.cos(Math.PI*theta)+3;
+			var z = -1*(1*Math.sin(Math.PI*theta)+2);
+			if (delay == 0)
+				return this.GetVertex(x, z, radius);
+			else
+				return new THREE.Vector3(x, y, z);
+		}
+		else if (t < accum[6] + distances[6])
+		{
+			var x = 4;
+			var z = - (t - accum[6] + 2);
+			if (delay == 0)
+				return this.GetVertex(x, z, radius);
+			else
+				return new THREE.Vector3(x, y, z);
+		}
+		else if (t < accum[7] + distances[7])
+		{
+			var theta = -1 - (t - accum[7]) / distances[7];
+			var x = 1*Math.cos(Math.PI*theta)+5;
+			var z = -1*(1*Math.sin(Math.PI*theta)+3);
+			if (delay == 0)
+				return this.GetVertex(x, z, radius);
+			else
+				return new THREE.Vector3(x, y, z);
+		}
+		else if (t < accum[8] + distances[8])
+		{
+			var x = 6;
+			var z = -(distances[8] - (t - accum[8]));
+			if (delay == 0)
+				return this.GetVertex(x, z, radius);
+			else
+				return new THREE.Vector3(x, y, z);
+		}
+		else if (t < accum[9] + distances[9])
+		{
+			var theta = -(t - accum[9]) / distances[9];
+			var x = 3*Math.cos(Math.PI*theta)+3;
+			var z = -1*(3*Math.sin(Math.PI*theta));
+			if (delay == 0)
+				return this.GetVertex(x, z, radius);
+			else
+				return new THREE.Vector3(x, y, z);
+		}
 		else
-			return new THREE.Vector3(x, y, z);
-	}
-	else if (t < accum[1] + distances[1])
-	{
-		var theta = -1 - (t - accum[1]) / distances[1];
-		var x = 4*Math.cos(Math.PI*theta)+4;
-		var z = -1*(4*Math.sin(Math.PI*theta)+8);
-		if (delay == 0)
-			return this.GetVertex(x, z, radius);
-		else
-			return new THREE.Vector3(x, y, z);
-	}
-	else if (t < accum[2] + distances[2])
-	{
-		var theta = -(t - accum[2]) / distances[2];
-		var x = 2*Math.cos(Math.PI*theta)+6;
-		var z = -1*(2*Math.sin(Math.PI*theta)+8);
-		if (delay == 0)
-			return this.GetVertex(x, z, radius);
-		else
-			return new THREE.Vector3(x, y, z);
-	}
-	else if (t < accum[3] + distances[3])
-	{
-		var theta = (t - accum[3]) / distances[3];
-		var x = 1*Math.cos(Math.PI*theta)+3;
-		var z = -1*(1*Math.sin(Math.PI*theta)+8);
-		if (delay == 0)
-			return this.GetVertex(x, z, radius);
-		else
-			return new THREE.Vector3(x, y, z);
-	}
-	else if (t < accum[4] + distances[4])
-	{
-		var x = 2;
-		var z = -2 - (distances[4] - (t - accum[4]));
-		if (delay == 0)
-			return this.GetVertex(x, z, radius);
-		else
-			return new THREE.Vector3(x, y, z);
-	}
-	else if (t < accum[5] + distances[5])
-	{
-		var theta = 1 + (t - accum[5]) / distances[5];
-		var x = 1*Math.cos(Math.PI*theta)+3;
-		var z = -1*(1*Math.sin(Math.PI*theta)+2);
-		if (delay == 0)
-			return this.GetVertex(x, z, radius);
-		else
-			return new THREE.Vector3(x, y, z);
-	}
-	else if (t < accum[6] + distances[6])
-	{
-		var x = 4;
-		var z = - (t - accum[6] + 2);
-		if (delay == 0)
-			return this.GetVertex(x, z, radius);
-		else
-			return new THREE.Vector3(x, y, z);
-	}
-	else if (t < accum[7] + distances[7])
-	{
-		var theta = -1 - (t - accum[7]) / distances[7];
-		var x = 1*Math.cos(Math.PI*theta)+5;
-		var z = -1*(1*Math.sin(Math.PI*theta)+3);
-		if (delay == 0)
-			return this.GetVertex(x, z, radius);
-		else
-			return new THREE.Vector3(x, y, z);
-	}
-	else if (t < accum[8] + distances[8])
-	{
-		var x = 6;
-		var z = -(distances[8] - (t - accum[8]));
-		if (delay == 0)
-			return this.GetVertex(x, z, radius);
-		else
-			return new THREE.Vector3(x, y, z);
-	}
-	else if (t < accum[9] + distances[9])
-	{
-		var theta = -(t - accum[9]) / distances[9];
-		var x = 3*Math.cos(Math.PI*theta)+3;
-		var z = -1*(3*Math.sin(Math.PI*theta));
-		if (delay == 0)
-			return this.GetVertex(x, z, radius);
-		else
-			return new THREE.Vector3(x, y, z);
-	}
-	else
-	{
-		return null;
+		{
+			t -= (accum[9] + distances[9]);
+		}
 	}
 }

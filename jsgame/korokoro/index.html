@@ -61,6 +61,7 @@ var _rAF = window.mozRequestAnimationFrame ||
 	window.webkitRequestAnimationFrame;
 
 var _scene;
+var _sceneTwin;
 var _renderer;
 var _camera;
 var _cameraPos = { x: 0, y: 1.3333, z: 3.3333 };
@@ -102,6 +103,7 @@ function onLoadFunc()
 	//light.castShadow = true; // According to the reference, it is expensive...
 
 	_scene.add(light); 
+	_sceneTwin = _scene.clone();
 
 	// Create a shaded, texture-mapped cube, objects and add them to the scene 
 	var texLoader = new THREE.TextureLoader();
@@ -118,13 +120,16 @@ function onLoadFunc()
 		_marble2.mesh.position.x = -0.5;
 	});
 
-	_raceTrack = new RaceTrack(_scene);
+	_raceTrack = new RaceTrack(_scene, _sceneTwin);
 	_raceTrack.Init();
 
 	//var cube = new RandomCube(_scene);
 	//cube.Init();
 
 	// Don't need to render here. (Textures are not loaded at this point anyway.)
+	_renderer.autoClear = false;
+	_renderer.render(_sceneTwin, _camera);
+	_renderer.clearDepth();
 	_renderer.render(_scene, _camera);
 }
 
@@ -211,11 +216,12 @@ function updateStatus()
 
 	if (_run)
 	{
-		_time += 0.01;
+		_time += 0.05;
 		var camPosition = _raceTrack.GetCameraPos(_time);
 		var camFocus = _raceTrack.GetFocusPos(_time);
-		var ballPos = _raceTrack.GetBallPos(_time, 0.25);
-		if (camFocus == null || camPosition == null || ballPos == null)
+		var ballPos1 = _raceTrack.GetBallPos(_time, 0.16);
+		var ballPos2 = _raceTrack.GetBallPos(_time - 1, 0.16);
+		if (camFocus == null || camPosition == null)
 		{
 			_run = false;
 			_time = 0;
@@ -224,10 +230,20 @@ function updateStatus()
 		{
 			_camera.position.set(camPosition.x, camPosition.y, camPosition.z);
 			_camera.lookAt(camFocus);
-			_marble1.mesh.rotation.x -= 0.05;
-			_marble1.mesh.position.x = ballPos.x;
-			_marble1.mesh.position.y = ballPos.y;
-			_marble1.mesh.position.z = ballPos.z;
+			if (ballPos1 != null)
+			{
+				_marble1.mesh.rotation.x -= 0.05;
+				_marble1.mesh.position.x = ballPos1.x;
+				_marble1.mesh.position.y = ballPos1.y;
+				_marble1.mesh.position.z = ballPos1.z;
+			}
+			if (ballPos2 != null)
+			{
+				_marble2.mesh.rotation.x -= 0.05;
+				_marble2.mesh.position.x = ballPos2.x;
+				_marble2.mesh.position.y = ballPos2.y;
+				_marble2.mesh.position.z = ballPos2.z;
+			}
 		}
 	}
 	else
@@ -236,6 +252,10 @@ function updateStatus()
 		//_camera.lookAt(_marble1.mesh.position)
 	}
 
+	//_renderer.clearDepth();
+	_renderer.autoClear = false;
+	_renderer.render(_sceneTwin, _camera);
+	_renderer.clearDepth();
 	_renderer.render(_scene, _camera);
 
 	_rAF(updateStatus)
