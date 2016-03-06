@@ -179,6 +179,9 @@ RaceTrack.prototype.Init = function()
 	line.material.opacity = 0.25;
 	line.material.transparent = true;
 
+	this.object.castShadow = false;
+	this.object.receiveShadow = true;
+
 	//line.position.x = 0.2;
 	//line.position.y = 0.2;
 	group.add(line);

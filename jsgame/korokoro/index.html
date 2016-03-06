@@ -81,8 +81,10 @@ function onLoadFunc()
 	var container = document.getElementById("container"); 
 
 	// Create the Three.js renderer, add it to our div 
-	_renderer = new THREE.WebGLRenderer();
+	_renderer = new THREE.WebGLRenderer( { antialias: true } );
 	_renderer.setSize(container.offsetWidth, container.offsetHeight);
+	_renderer.shadowMap.enabled = true;
+	_renderer.shadowMap.type = THREE.PCFShadowMap;
 	container.appendChild(_renderer.domElement); 
 
 	// Create a new Three.js scene 
@@ -90,12 +92,15 @@ function onLoadFunc()
 
 	// Put in a camera 
 	_camera = new THREE.PerspectiveCamera
-		(45, container.offsetWidth / container.offsetHeight, 1, 4000 ); 
-	_camera.position.set(_cameraPos.x, _cameraPos.y, _cameraPos.z );
+		(45, container.offsetWidth / container.offsetHeight, 1, 4000);
+	_camera.position.set(_cameraPos.x, _cameraPos.y, _cameraPos.z);
 
 	// Create a directional light to show off the object 
 	var light = new THREE.DirectionalLight(0xffffff, 1.5); 
 	light.position.set(0, 1, 0);
+
+	//light.castShadow = true; // According to the reference, it is expensive...
+
 	_scene.add(light); 
 
 	// Create a shaded, texture-mapped cube, objects and add them to the scene 
