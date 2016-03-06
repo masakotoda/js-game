@@ -268,11 +268,11 @@ RaceTrack.prototype.GetPos = function(t, y, radius, delay, offset)
 	distances[0] = 8.0;
 	distances[1] = 4*Math.PI;
 	distances[2] = 2*Math.PI;
-	distances[3] = 1*Math.PI;
+	distances[3] = 1.75*Math.PI; // It actually 1*PI, but it's pretty tight curve. It looks more natural to be slower (simulate longer distance)
 	distances[4] = 6.0;
-	distances[5] = 1*Math.PI;
+	distances[5] = 1.75*Math.PI; // It actually 1*PI, but it's pretty tight curve. It looks more natural to be slower (simulate longer distance)
 	distances[6] = 1;
-	distances[7] = 1*Math.PI;
+	distances[7] = 1.75*Math.PI; // It actually 1*PI, but it's pretty tight curve. It looks more natural to be slower (simulate longer distance)
 	distances[8] = 3;
 	distances[9] = 3*Math.PI;
 

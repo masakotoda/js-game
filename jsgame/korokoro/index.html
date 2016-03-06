@@ -238,6 +238,11 @@ function updateStatus()
 				_marble1.mesh.position.x = ballPos1.position.x;
 				_marble1.mesh.position.y = ballPos1.position.y;
 				_marble1.mesh.position.z = ballPos1.position.z;
+
+				var shadowPos1 = _raceTrack.GetBallPos(_time, 0, 0.5);
+				_marble1.shadow.position.x = shadowPos1.position.x;
+				_marble1.shadow.position.y = shadowPos1.position.y + 0.01;
+				_marble1.shadow.position.z = shadowPos1.position.z;
 			}
 			if (ballPos2 != null)
 			{
@@ -247,6 +252,11 @@ function updateStatus()
 				_marble2.mesh.position.x = ballPos2.position.x;
 				_marble2.mesh.position.y = ballPos2.position.y;
 				_marble2.mesh.position.z = ballPos2.position.z;
+
+				var shadowPos2= _raceTrack.GetBallPos(_time, 0, -0.5);
+				_marble2.shadow.position.x = shadowPos2.position.x;
+				_marble2.shadow.position.y = shadowPos2.position.y + 0.01;
+				_marble2.shadow.position.z = shadowPos2.position.z;
 			}
 		}
 	}
