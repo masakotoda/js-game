@@ -293,9 +293,9 @@ RaceTrack.prototype.GetPos = function(t, y, radius, delay, offset)
 			var x = offset;
 			var z = -t;
 			if (delay == 0)
-				return this.GetVertex(x, z, radius);
+				return { position: this.GetVertex(x, z, radius), velocity: new THREE.Vector3(0.05, 0, 0) };
 			else
-				return new THREE.Vector3(x, y, z);
+				return { position: new THREE.Vector3(x, y, z) };
 		}
 		else if (t < accum[1] + distances[1])
 		{
@@ -304,9 +304,9 @@ RaceTrack.prototype.GetPos = function(t, y, radius, delay, offset)
 			var x = r*Math.cos(Math.PI*theta)+4;
 			var z = -1*(r*Math.sin(Math.PI*theta)+8);
 			if (delay == 0)
-				return this.GetVertex(x, z, radius);
+				return { position: this.GetVertex(x, z, radius), velocity: new THREE.Vector3(0.05*Math.cos(Math.PI*(t - accum[1]) / distances[1]), 0, 0.05*Math.sin(Math.PI*(t - accum[1]) / distances[1])) };
 			else
-				return new THREE.Vector3(x, y, z);
+				return { position: new THREE.Vector3(x, y, z) };
 		}
 		else if (t < accum[2] + distances[2])
 		{
@@ -315,9 +315,9 @@ RaceTrack.prototype.GetPos = function(t, y, radius, delay, offset)
 			var x = r*Math.cos(Math.PI*theta)+6;
 			var z = -1*(r*Math.sin(Math.PI*theta)+8);
 			if (delay == 0)
-				return this.GetVertex(x, z, radius);
+				return { position: this.GetVertex(x, z, radius), velocity: new THREE.Vector3(-0.05*Math.cos(Math.PI*(t - accum[2]) / distances[2]), 0, -0.05*Math.sin(Math.PI*(t - accum[2]) / distances[2])) };
 			else
-				return new THREE.Vector3(x, y, z);
+				return { position: new THREE.Vector3(x, y, z) };
 		}
 		else if (t < accum[3] + distances[3])
 		{
@@ -326,18 +326,18 @@ RaceTrack.prototype.GetPos = function(t, y, radius, delay, offset)
 			var x = r*Math.cos(Math.PI*theta)+3;
 			var z = -1*(r*Math.sin(Math.PI*theta)+8);
 			if (delay == 0)
-				return this.GetVertex(x, z, radius);
+				return { position: this.GetVertex(x, z, radius), velocity: new THREE.Vector3(0.1*Math.cos(Math.PI*(t - accum[3]) / distances[3]), 0, -0.1*Math.sin(Math.PI*(t - accum[3]) / distances[3])) };
 			else
-				return new THREE.Vector3(x, y, z);
+				return { position: new THREE.Vector3(x, y, z) };
 		}
 		else if (t < accum[4] + distances[4])
 		{
 			var x = 2 - offset;
 			var z = -2 - (distances[4] - (t - accum[4]));
 			if (delay == 0)
-				return this.GetVertex(x, z, radius);
+				return { position: this.GetVertex(x, z, radius), velocity: new THREE.Vector3(-0.05, 0, 0) };
 			else
-				return new THREE.Vector3(x, y, z);
+				return { position: new THREE.Vector3(x, y, z) };
 		}
 		else if (t < accum[5] + distances[5])
 		{
@@ -346,18 +346,18 @@ RaceTrack.prototype.GetPos = function(t, y, radius, delay, offset)
 			var x = r*Math.cos(Math.PI*theta)+3;
 			var z = -1*(r*Math.sin(Math.PI*theta)+2);
 			if (delay == 0)
-				return this.GetVertex(x, z, radius);
+				return { position: this.GetVertex(x, z, radius), velocity: new THREE.Vector3(-0.1*Math.cos(Math.PI*(t - accum[5]) / distances[5]), 0, 0.1*Math.sin(Math.PI*(t - accum[5]) / distances[5])) };
 			else
-				return new THREE.Vector3(x, y, z);
+				return { position: new THREE.Vector3(x, y, z) };
 		}
 		else if (t < accum[6] + distances[6])
 		{
 			var x = 4 + offset;
 			var z = - (t - accum[6] + 2);
 			if (delay == 0)
-				return this.GetVertex(x, z, radius);
+				return { position: this.GetVertex(x, z, radius), velocity: new THREE.Vector3(0.05, 0, 0) };
 			else
-				return new THREE.Vector3(x, y, z);
+				return { position: new THREE.Vector3(x, y, z) };
 		}
 		else if (t < accum[7] + distances[7])
 		{
@@ -366,18 +366,18 @@ RaceTrack.prototype.GetPos = function(t, y, radius, delay, offset)
 			var x = r*Math.cos(Math.PI*theta)+5;
 			var z = -1*(r*Math.sin(Math.PI*theta)+3);
 			if (delay == 0)
-				return this.GetVertex(x, z, radius);
+				return { position: this.GetVertex(x, z, radius), velocity: new THREE.Vector3(0.1*Math.cos(Math.PI*(t - accum[7]) / distances[7]), 0, 0.1*Math.sin(Math.PI*(t - accum[7]) / distances[7])) };
 			else
-				return new THREE.Vector3(x, y, z);
+				return { position: new THREE.Vector3(x, y, z) };
 		}
 		else if (t < accum[8] + distances[8])
 		{
 			var x = 6 - offset;
 			var z = -(distances[8] - (t - accum[8]));
 			if (delay == 0)
-				return this.GetVertex(x, z, radius);
+				return { position: this.GetVertex(x, z, radius), velocity: new THREE.Vector3(-0.05, 0, 0) };
 			else
-				return new THREE.Vector3(x, y, z);
+				return { position: new THREE.Vector3(x, y, z) };
 		}
 		else if (t < accum[9] + distances[9])
 		{
@@ -386,9 +386,9 @@ RaceTrack.prototype.GetPos = function(t, y, radius, delay, offset)
 			var x = r*Math.cos(Math.PI*theta)+3;
 			var z = -1*(r*Math.sin(Math.PI*theta));
 			if (delay == 0)
-				return this.GetVertex(x, z, radius);
+				return { position: this.GetVertex(x, z, radius), velocity: new THREE.Vector3(-0.05*Math.cos(Math.PI*(t - accum[9]) / distances[9]), 0, -0.05*Math.sin(Math.PI*(t - accum[9]) / distances[9])) };
 			else
-				return new THREE.Vector3(x, y, z);
+				return { position: new THREE.Vector3(x, y, z) };
 		}
 		else
 		{

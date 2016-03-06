@@ -217,8 +217,8 @@ function updateStatus()
 	if (_run)
 	{
 		_time += 0.05;
-		var camPosition = _raceTrack.GetCameraPos(_time);
-		var camFocus = _raceTrack.GetFocusPos(_time);
+		var camPosition = _raceTrack.GetCameraPos(_time).position;
+		var camFocus = _raceTrack.GetFocusPos(_time).position;
 		var ballPos1 = _raceTrack.GetBallPos(_time, 0.16, 0.5);
 		var ballPos2 = _raceTrack.GetBallPos(_time, 0.16, -0.5);
 		if (camFocus == null || camPosition == null)
@@ -232,17 +232,21 @@ function updateStatus()
 			_camera.lookAt(camFocus);
 			if (ballPos1 != null)
 			{
-				_marble1.mesh.rotation.x -= 0.05;
-				_marble1.mesh.position.x = ballPos1.x;
-				_marble1.mesh.position.y = ballPos1.y;
-				_marble1.mesh.position.z = ballPos1.z;
+				_marble1.mesh.rotation.x -= ballPos1.velocity.x;
+				_marble1.mesh.rotation.y -= ballPos1.velocity.y;
+				_marble1.mesh.rotation.z -= ballPos1.velocity.z;
+				_marble1.mesh.position.x = ballPos1.position.x;
+				_marble1.mesh.position.y = ballPos1.position.y;
+				_marble1.mesh.position.z = ballPos1.position.z;
 			}
 			if (ballPos2 != null)
 			{
-				_marble2.mesh.rotation.x -= 0.05;
-				_marble2.mesh.position.x = ballPos2.x;
-				_marble2.mesh.position.y = ballPos2.y;
-				_marble2.mesh.position.z = ballPos2.z;
+				_marble2.mesh.rotation.x -= ballPos2.velocity.x;
+				_marble2.mesh.rotation.y -= ballPos2.velocity.y;
+				_marble2.mesh.rotation.z -= ballPos2.velocity.z;
+				_marble2.mesh.position.x = ballPos2.position.x;
+				_marble2.mesh.position.y = ballPos2.position.y;
+				_marble2.mesh.position.z = ballPos2.position.z;
 			}
 		}
 	}
