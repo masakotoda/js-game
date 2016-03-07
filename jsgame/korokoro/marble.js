@@ -4,38 +4,63 @@ function Marble(scene, textureName)
 	this.scene = scene;
 	this.textureName = textureName;
 	this.mesh = null;
-
 	this.shadow = null;
 }
 
-Marble.prototype.Init = function(texture)
+Marble.prototype.CreateMesh = function(texture)
 {
 	var radius = 0.16;
 	var segment = 32;
+
 	var material = new THREE.MeshPhongMaterial({ map: texture });
-	var geometry = new THREE.SphereGeometry(radius, segment, segment);
-	this.mesh = new THREE.Mesh(geometry, material);
+	var geomBall = new THREE.SphereGeometry(radius, segment, segment);
+	this.mesh = new THREE.Mesh(geomBall, material);
 	this.mesh.rotation = 0;
 	this.mesh.position.x = 0;
 	this.mesh.position.y = radius;
 	this.mesh.castShadow = true;
 	this.mesh.receiveShadow = false;
+}
 
-	var geom = new THREE.Geometry();
-	geom.vertices.push(new THREE.Vector3(0, 0, 0));
-	for (var i = 0; i < 20; i++)
+Marble.prototype.CreateShadow = function()
+{
+	var radius = 0.20;
+	var segment = 32;
+
+	var material = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.25 });
+	var geometry = new THREE.Geometry();
+
+	for (var i = 0; i < segment; i++)
 	{
-		var v = new THREE.Vector3(radius * 1.2 * Math.cos(2*Math.PI*i/20), 0, -radius * 1.2 * Math.sin(2*Math.PI*i/20));
-		geom.vertices.push(v);
+		var vertex = new THREE.Vector3(
+				radius * Math.cos(2*Math.PI*i/segment), 
+				0, 
+				-radius * Math.sin(2*Math.PI*i/segment));
+		geometry.vertices.push(vertex);
 	}
-	for (var i = 1; i <= 20; i++)
+	geometry.vertices.push(new THREE.Vector3(0, 0, 0));
+
+	for (var i = 0; i < segment - 1; i++)
 	{
-		if (i == 20)
-			geom.faces.push(new THREE.Face3(0, i, 1));
-		else
-			geom.faces.push(new THREE.Face3(0, i, i + 1));
+		geometry.faces.push(new THREE.Face3(segment, i, i + 1));
 	}
-	this.shadow = new THREE.Mesh(geom, new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.25}));
+	geometry.faces.push(new THREE.Face3(segment, segment - 1, 0));
+
+	this.shadow = new THREE.Mesh(geometry, material);
+}
+
+Marble.prototype.Init = function(texture)
+{
+	this.CreateShadow();
 	this.scene.add(this.shadow);
+
+	this.CreateMesh(texture);
 	this.scene.add(this.mesh);
+}
+
+Marble.prototype.SetInitialPos = function(x)
+{
+	this.mesh.position.x = x;
+	this.shadow.position.x = x;
+	this.shadow.position.y = 0.01;
 }

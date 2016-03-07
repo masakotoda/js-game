@@ -1,8 +1,8 @@
 
-function RaceTrack(scene, sceneTwin)
+function RaceTrack(scene)
 {
 	this.scene = scene;
-	this.sceneTwin = sceneTwin;
+	//this.sceneTwin = sceneTwin;
 	this.object = null;
 	this.raycaster = new THREE.Raycaster();
 }
@@ -200,11 +200,11 @@ RaceTrack.prototype.Init = function()
 
 	var twin = new THREE.Mesh(geom, new THREE.MeshBasicMaterial( { color: 0xcc0008 } ));
 	twin.position.y = -0.1;
-	var groupTwin = new THREE.Group()
-	groupTwin.add(twin);
-	groupTwin.scale.multiplyScalar(2);
-	this.sceneTwin.add(groupTwin);
-	groupTwin.updateMatrixWorld(true);
+	//var groupTwin = new THREE.Group()
+	group.add(twin);
+	//groupTwin.scale.multiplyScalar(2);
+	//this.sceneTwin.add(groupTwin);
+	//groupTwin.updateMatrixWorld(true);
 }
 
 RaceTrack.prototype.GetCameraPos = function(t)
