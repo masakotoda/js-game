@@ -5,6 +5,22 @@ function Marble(scene, textureName)
 	this.textureName = textureName;
 	this.mesh = null;
 	this.shadow = null;
+	this.offset = 0;
+	this.status = 0; // TODO: find out how to do "enum"!
+}
+
+Marble.prototype.moveLeftBy = function(delta)
+{
+	this.offset -= delta;
+	if (this.offset < -0.9)
+		this.offset = -0.9;
+}
+
+Marble.prototype.moveRightBy = function(delta)
+{
+	this.offset += delta;
+	if (this.offset > 0.9)
+		this.offset = 0.9;
 }
 
 Marble.prototype.CreateMesh = function(texture)
@@ -63,4 +79,5 @@ Marble.prototype.SetInitialPos = function(x)
 	this.mesh.position.x = x;
 	this.shadow.position.x = x;
 	this.shadow.position.y = 0.01;
+	this.offset = x;
 }

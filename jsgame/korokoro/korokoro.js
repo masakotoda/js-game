@@ -82,19 +82,42 @@ Korokoro.prototype.onLoadFunc = function()
 	// Don't need to render here. (Textures are not loaded at this point anyway.)
 }
 
+Korokoro.prototype.onKeyDownFunc = function(e)
+{
+	var key = e.keyCode ? e.keyCode : e.which;
+	if (key == 39) // Right
+		this.marble1.status = 1;
+	else if (key == 37) // Left
+		this.marble1.status = 2;
+	else if (key == 38) // Up
+		; // TODO Jump
+	else if (key == "D".charCodeAt(0))
+		this.marble2.status = 1;
+	else if (key == "A".charCodeAt(0))
+		this.marble2.status = 2;
+	else if (key == "W".charCodeAt(0))
+		; // TODO Jump
+}
+
 Korokoro.prototype.onKeyUpFunc = function(e)
 {
+	// In case next key is pressed before releasing the prev key.
+	// (e.g. Left down -> Right down -> Left up -> Left down)
 	var key = e.keyCode ? e.keyCode : e.which;
 	if (key == 32) // Space key
 		this.run = true;
+	else if (key == 39 && this.marble1.status == 1) // Right
+		this.marble1.status = 0;
+	else if (key == 37 && this.marble1.status == 2) // Left
+		this.marble1.status = 0;
 	else if (key == 38) // Up
-		this.cameraPos.z -= 0.01;
-	else if (key == 40) // Down
-		this.cameraPos.z += 0.01;
-	else if (key == 37) // Left
-		this.cameraPos.x -= 0.01;
-	else if (key == 39) // Right
-		this.cameraPos.x += 0.01;
+		this.marble1.status = 0;
+	else if (key == "D".charCodeAt(0) && this.marble2.status == 1)
+		this.marble2.status = 0;
+	else if (key == "A".charCodeAt(0) && this.marble2.status == 2)
+		this.marble2.status = 0;
+	else if (key == "W".charCodeAt(0))
+		this.marble2.status = 0;
 }
 
 Korokoro.prototype.scanGamepads = function()
@@ -127,7 +150,13 @@ Korokoro.prototype.isButtonPressed = function(button)
 Korokoro.prototype.updatePlayer = function(gamepad, marble)
 {
 	if (!gamepad)
+	{
+		if (marble.status == 1)
+			marble.moveRightBy(0.02);
+		else if (marble.status == 2)
+			marble.moveLeftBy(0.02);
 		return;
+	}
 
 	var buttons = gamepad.buttons;
 	for (var i = 0; i < buttons.length; i++)
@@ -136,9 +165,9 @@ Korokoro.prototype.updatePlayer = function(gamepad, marble)
 		{
 			marble.mesh.rotation.x -= 0.05;
 			if (i == this.c_buttonRight)
-				marble.mesh.position.x -= 0.01;
+				marble.moveRightBy(0.02);
 			else if (i == this.c_buttonLeft)
-				marble.mesh.position.x += 0.01;
+				marble.moveLeftBy(0.02);
 			else if (i == this.c_buttonA)
 				marble.mesh.position.z -= 0.01;
 			else if (i == this.c_buttonB)
@@ -181,8 +210,8 @@ Korokoro.prototype.updateStatus = function()
 		this.time += 0.05;
 		var camPosition = this.raceTrack.GetCameraPos(this.time).position;
 		var camFocus = this.raceTrack.GetFocusPos(this.time).position;
-		var ballPos1 = this.raceTrack.GetBallPos(this.time, 0.16, 0.5);
-		var ballPos2 = this.raceTrack.GetBallPos(this.time, 0.16, -0.5);
+		var ballPos1 = this.raceTrack.GetBallPos(this.time, 0.16, this.marble1.offset);
+		var ballPos2 = this.raceTrack.GetBallPos(this.time, 0.16, this.marble2.offset);
 		if (camFocus == null || camPosition == null)
 		{
 			this.run = false;
@@ -201,7 +230,7 @@ Korokoro.prototype.updateStatus = function()
 				this.marble1.mesh.position.y = ballPos1.position.y;
 				this.marble1.mesh.position.z = ballPos1.position.z;
 
-				var shadowPos1 = this.raceTrack.GetBallPos(this.time, 0, 0.5);
+				var shadowPos1 = this.raceTrack.GetBallPos(this.time, 0, this.marble1.offset);
 				this.marble1.shadow.position.x = shadowPos1.position.x;
 				this.marble1.shadow.position.y = shadowPos1.position.y + 0.01;
 				this.marble1.shadow.position.z = shadowPos1.position.z;
@@ -215,7 +244,7 @@ Korokoro.prototype.updateStatus = function()
 				this.marble2.mesh.position.y = ballPos2.position.y;
 				this.marble2.mesh.position.z = ballPos2.position.z;
 
-				var shadowPos2= this.raceTrack.GetBallPos(this.time, 0, -0.5);
+				var shadowPos2= this.raceTrack.GetBallPos(this.time, 0, this.marble2.offset);
 				this.marble2.shadow.position.x = shadowPos2.position.x;
 				this.marble2.shadow.position.y = shadowPos2.position.y + 0.01;
 				this.marble2.shadow.position.z = shadowPos2.position.z;
@@ -228,7 +257,6 @@ Korokoro.prototype.updateStatus = function()
 		//this.camera.lookAt(this.marble1.mesh.position)
 	}
 
-	//this.renderer.clearDepth();
 	this.renderer.autoClear = false;
 	this.renderer.render(this.sceneTwin, this.camera);
 	this.renderer.clearDepth();

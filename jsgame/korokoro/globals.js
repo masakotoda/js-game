@@ -17,6 +17,10 @@ function _korokoro()
 		_updateStatus();
 	});
 
+	window.onkeydown = function(e) {
+		_game.onKeyDownFunc(e);
+	}
+
 	window.onkeyup = function(e) {
 		_game.onKeyUpFunc(e);
 	}
