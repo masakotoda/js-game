@@ -86,15 +86,15 @@ Korokoro.prototype.onKeyDownFunc = function(e)
 {
 	var key = e.keyCode ? e.keyCode : e.which;
 	if (key == 39) // Right
-		this.marble1.status = Marble.State.MovingRight;
-	else if (key == 37) // Left
-	    this.marble1.status = Marble.State.MovingLeft;
-	else if (key == 38) // Up
+		this.marble1.status = Marble.Status.MovingRight;
+	else if (key == 37 && this.marble1.outOfControl <= 0) // Left
+		this.marble1.status = Marble.Status.MovingLeft;
+	else if (key == 38 && this.marble1.outOfControl <= 0) // Up
 		; // TODO Jump
-	else if (key == "D".charCodeAt(0))
-	    this.marble2.status = Marble.State.MovingRight;
-	else if (key == "A".charCodeAt(0))
-	    this.marble2.status = Marble.State.MovingLeft;
+	else if (key == "D".charCodeAt(0) && this.marble2.outOfControl <= 0)
+		this.marble2.status = Marble.Status.MovingRight;
+	else if (key == "A".charCodeAt(0) && this.marble2.outOfControl <= 0)
+		this.marble2.status = Marble.Status.MovingLeft;
 	else if (key == "W".charCodeAt(0))
 		; // TODO Jump
 }
@@ -106,15 +106,15 @@ Korokoro.prototype.onKeyUpFunc = function(e)
 	var key = e.keyCode ? e.keyCode : e.which;
 	if (key == 32) // Space key
 		this.run = true;
-	else if (key == 39 && this.marble1.status == Marble.State.MovingRight) // Right
+	else if (key == 39 && this.marble1.status == Marble.Status.MovingRight) // Right
 		this.marble1.status = 0;
-	else if (key == 37 && this.marble1.status == Marble.State.MovingLeft) // Left
+	else if (key == 37 && this.marble1.status == Marble.Status.MovingLeft) // Left
 		this.marble1.status = 0;
 	else if (key == 38) // Up
 		this.marble1.status = 0;
-	else if (key == "D".charCodeAt(0) && this.marble2.status == Marble.State.MovingRight)
+	else if (key == "D".charCodeAt(0) && this.marble2.status == Marble.Status.MovingRight)
 		this.marble2.status = 0;
-	else if (key == "A".charCodeAt(0) && this.marble2.status == Marble.State.MovingLeft)
+	else if (key == "A".charCodeAt(0) && this.marble2.status == Marble.Status.MovingLeft)
 		this.marble2.status = 0;
 	else if (key == "W".charCodeAt(0))
 		this.marble2.status = 0;
@@ -147,14 +147,54 @@ Korokoro.prototype.isButtonPressed = function(button)
 	return pressed;
 }
 
+Korokoro.prototype.processState = function(m1, m2)
+{
+	if (m1.mesh && m2.mesh)
+	{
+		if (m1.outOfControl <= 0)
+		{
+			var radius = 0.16;
+			var dx = m1.mesh.position.x - m2.mesh.position.x;
+			var dy = m1.mesh.position.y - m2.mesh.position.y;
+			var dz = m1.mesh.position.z - m2.mesh.position.z;
+			var d2 = dx*dx + dy*dy + dz*dz;
+			if (d2 - (radius*1.8)*(radius*1.8) <= 0) // Two balls merge for a bit. It looks a little more realistic collision.
+			{
+				if (m1.offset < m2.offset)
+				{
+					m1.status = Marble.Status.MovingLeft;
+					m2.status = Marble.Status.MovingRight;
+				}
+				else
+				{
+					m1.status = Marble.Status.MovingRight;
+					m2.status = Marble.Status.MovingLeft;
+				}
+				m1.outOfControl = 30;
+				m2.outOfControl = 30;
+			}
+		}
+		else
+		{
+			m1.outOfControl--;
+			m2.outOfControl--;
+			if (m1.outOfControl <= 0)
+			{
+				m1.status = 0;
+				m2.status = 0;
+			}
+		}
+	}
+}
+
 Korokoro.prototype.updatePlayer = function(gamepad, marble)
 {
 	if (!gamepad)
 	{
-		if (marble.status == 1)
-			marble.moveRightBy(0.02);
-		else if (marble.status == 2)
-			marble.moveLeftBy(0.02);
+		if (marble.status == Marble.Status.MovingRight)
+			marble.moveRight();
+		else if (marble.status == Marble.Status.MovingLeft)
+			marble.moveLeft(0.02);
 		return;
 	}
 
@@ -165,9 +205,9 @@ Korokoro.prototype.updatePlayer = function(gamepad, marble)
 		{
 			marble.mesh.rotation.x -= 0.05;
 			if (i == this.c_buttonRight)
-				marble.moveRightBy(0.02);
+				marble.moveRight();
 			else if (i == this.c_buttonLeft)
-				marble.moveLeftBy(0.02);
+				marble.moveLeft();
 			else if (i == this.c_buttonA)
 				marble.mesh.position.z -= 0.01;
 			else if (i == this.c_buttonB)
@@ -202,6 +242,7 @@ Korokoro.prototype.updateStatus = function()
 {
 	this.scanGamepads();
 
+	this.processState(this.marble1, this.marble2);
 	this.updatePlayer(this.gamepad1, this.marble1);
 	this.updatePlayer(this.gamepad2, this.marble2);
 

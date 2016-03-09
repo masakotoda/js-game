@@ -1,5 +1,5 @@
 
-Marble.State =
+Marble.Status =
 {
     MovingRight: 1,
     MovingLeft: 2
@@ -13,6 +13,7 @@ function Marble(scene, textureName)
 	this.shadow = null;
 	this.offset = 0;
 	this.status = 0;
+	this.outOfControl = 0;
 }
 
 Marble.prototype.moveLeftBy = function(delta)
@@ -22,11 +23,27 @@ Marble.prototype.moveLeftBy = function(delta)
 		this.offset = -0.9;
 }
 
+Marble.prototype.moveLeft = function()
+{
+	if (this.outOfControl)
+		this.moveLeftBy(this.outOfControl * 0.0015);
+	else
+		this.moveLeftBy(0.02);
+}
+
 Marble.prototype.moveRightBy = function(delta)
 {
 	this.offset += delta;
 	if (this.offset > 0.9)
 		this.offset = 0.9;
+}
+
+Marble.prototype.moveRight = function()
+{
+	if (this.outOfControl > 0)
+		this.moveRightBy(this.outOfControl * 0.0015);
+	else
+		this.moveRightBy(0.02);
 }
 
 Marble.prototype.CreateMesh = function(texture)
