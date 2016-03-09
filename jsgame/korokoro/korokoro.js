@@ -194,7 +194,7 @@ Korokoro.prototype.updatePlayer = function(gamepad, marble)
 		if (marble.status == Marble.Status.MovingRight)
 			marble.moveRight();
 		else if (marble.status == Marble.Status.MovingLeft)
-			marble.moveLeft(0.02);
+			marble.moveLeft();
 		return;
 	}
 
@@ -203,23 +203,32 @@ Korokoro.prototype.updatePlayer = function(gamepad, marble)
 	{
 		if (this.isButtonPressed(buttons[i]))
 		{
-			marble.mesh.rotation.x -= 0.05;
-			if (i == this.c_buttonRight)
-				marble.moveRight();
-			else if (i == this.c_buttonLeft)
-				marble.moveLeft();
-			else if (i == this.c_buttonA)
-				marble.mesh.position.z -= 0.01;
-			else if (i == this.c_buttonB)
-				marble.mesh.position.z += 0.01;
-			else if (i == this.c_buttonUp)
-				this.cameraPos.z -= 0.01;
-			else if (i == this.c_buttonDown)
-				this.cameraPos.z += 0.01;
-			else if (i == this.c_buttonX)
-				this.cameraPos.x -= 0.01;
-			else if (i == this.c_buttonY)
-				this.cameraPos.x += 0.01;
+			if (marble.outOfControl > 0)
+			{
+				if (marble.status == Marble.Status.MovingRight)
+					marble.moveRight();
+				else if (marble.status == Marble.Status.MovingLeft)
+					marble.moveLeft();
+			}
+			else
+			{
+				if (i == this.c_buttonRight)
+					marble.moveRight();
+				else if (i == this.c_buttonLeft)
+					marble.moveLeft();
+				else if (i == this.c_buttonA)
+					marble.mesh.position.z -= 0.01;
+				else if (i == this.c_buttonB)
+					marble.mesh.position.z += 0.01;
+				else if (i == this.c_buttonUp)
+					this.cameraPos.z -= 0.01;
+				else if (i == this.c_buttonDown)
+					this.cameraPos.z += 0.01;
+				else if (i == this.c_buttonX)
+					this.cameraPos.x -= 0.01;
+				else if (i == this.c_buttonY)
+					this.cameraPos.x += 0.01;
+			}
 		}
 	}
 }
