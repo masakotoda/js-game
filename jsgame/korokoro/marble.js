@@ -1,4 +1,10 @@
 
+Marble.State =
+{
+    MovingRight: 1,
+    MovingLeft: 2
+}
+
 function Marble(scene, textureName)
 {
 	this.scene = scene;
@@ -6,7 +12,7 @@ function Marble(scene, textureName)
 	this.mesh = null;
 	this.shadow = null;
 	this.offset = 0;
-	this.status = 0; // TODO: find out how to do "enum"!
+	this.status = 0;
 }
 
 Marble.prototype.moveLeftBy = function(delta)

@@ -86,15 +86,15 @@ Korokoro.prototype.onKeyDownFunc = function(e)
 {
 	var key = e.keyCode ? e.keyCode : e.which;
 	if (key == 39) // Right
-		this.marble1.status = 1;
+		this.marble1.status = Marble.State.MovingRight;
 	else if (key == 37) // Left
-		this.marble1.status = 2;
+	    this.marble1.status = Marble.State.MovingLeft;
 	else if (key == 38) // Up
 		; // TODO Jump
 	else if (key == "D".charCodeAt(0))
-		this.marble2.status = 1;
+	    this.marble2.status = Marble.State.MovingRight;
 	else if (key == "A".charCodeAt(0))
-		this.marble2.status = 2;
+	    this.marble2.status = Marble.State.MovingLeft;
 	else if (key == "W".charCodeAt(0))
 		; // TODO Jump
 }
@@ -106,15 +106,15 @@ Korokoro.prototype.onKeyUpFunc = function(e)
 	var key = e.keyCode ? e.keyCode : e.which;
 	if (key == 32) // Space key
 		this.run = true;
-	else if (key == 39 && this.marble1.status == 1) // Right
+	else if (key == 39 && this.marble1.status == Marble.State.MovingRight) // Right
 		this.marble1.status = 0;
-	else if (key == 37 && this.marble1.status == 2) // Left
+	else if (key == 37 && this.marble1.status == Marble.State.MovingLeft) // Left
 		this.marble1.status = 0;
 	else if (key == 38) // Up
 		this.marble1.status = 0;
-	else if (key == "D".charCodeAt(0) && this.marble2.status == 1)
+	else if (key == "D".charCodeAt(0) && this.marble2.status == Marble.State.MovingRight)
 		this.marble2.status = 0;
-	else if (key == "A".charCodeAt(0) && this.marble2.status == 2)
+	else if (key == "A".charCodeAt(0) && this.marble2.status == Marble.State.MovingLeft)
 		this.marble2.status = 0;
 	else if (key == "W".charCodeAt(0))
 		this.marble2.status = 0;
