@@ -85,18 +85,18 @@ Korokoro.prototype.onLoadFunc = function()
 Korokoro.prototype.onKeyDownFunc = function(e)
 {
 	var key = e.keyCode ? e.keyCode : e.which;
-	if (key == 39) // Right
+	if (key == 99 && this.marble1.outOfControl <= 0) // 10key - 3
 		this.marble1.status = Marble.Status.MovingRight;
-	else if (key == 37 && this.marble1.outOfControl <= 0) // Left
+	else if (key == 97 && this.marble1.outOfControl <= 0) // 10 key - 1
 		this.marble1.status = Marble.Status.MovingLeft;
-	else if (key == 38 && this.marble1.outOfControl <= 0) // Up
-		; // TODO Jump
+	else if (key == 101 && this.marble1.outOfControl <= 0) // 10 key - 5
+		this.marble1.setStatus(Marble.Status.Jump);
 	else if (key == "D".charCodeAt(0) && this.marble2.outOfControl <= 0)
 		this.marble2.status = Marble.Status.MovingRight;
 	else if (key == "A".charCodeAt(0) && this.marble2.outOfControl <= 0)
 		this.marble2.status = Marble.Status.MovingLeft;
-	else if (key == "W".charCodeAt(0))
-		; // TODO Jump
+	else if (key == "W".charCodeAt(0) && this.marble2.outOfControl <= 0)
+		this.marble2.setStatus(Marble.Status.Jump);
 }
 
 Korokoro.prototype.onKeyUpFunc = function(e)
@@ -106,11 +106,11 @@ Korokoro.prototype.onKeyUpFunc = function(e)
 	var key = e.keyCode ? e.keyCode : e.which;
 	if (key == 32) // Space key
 		this.run = true;
-	else if (key == 39 && this.marble1.status == Marble.Status.MovingRight) // Right
+	else if (key == 99 && this.marble1.status == Marble.Status.MovingRight) // 10 key - 3
 		this.marble1.status = 0;
-	else if (key == 37 && this.marble1.status == Marble.Status.MovingLeft) // Left
+	else if (key == 97 && this.marble1.status == Marble.Status.MovingLeft) // 10 key - 1
 		this.marble1.status = 0;
-	else if (key == 38) // Up
+	else if (key == 101) // 10 key - 5
 		this.marble1.status = 0;
 	else if (key == "D".charCodeAt(0) && this.marble2.status == Marble.Status.MovingRight)
 		this.marble2.status = 0;
@@ -151,7 +151,7 @@ Korokoro.prototype.processState = function(m1, m2)
 {
 	if (m1.mesh && m2.mesh)
 	{
-		if (m1.outOfControl <= 0)
+		if (m1.outOfControl <= 0 && m2.outOfControl <=0)
 		{
 			var radius = 0.16;
 			var dx = m1.mesh.position.x - m2.mesh.position.x;
@@ -170,18 +170,29 @@ Korokoro.prototype.processState = function(m1, m2)
 					m1.status = Marble.Status.MovingRight;
 					m2.status = Marble.Status.MovingLeft;
 				}
-				m1.outOfControl = 30;
-				m2.outOfControl = 30;
+				m1.outOfControl = Marble.OutOfControlTime.collision;
+				m2.outOfControl = Marble.OutOfControlTime.collision;
 			}
 		}
 		else
 		{
-			m1.outOfControl--;
-			m2.outOfControl--;
-			if (m1.outOfControl <= 0)
+			if (m1.outOfControl > 0)
 			{
-				m1.status = 0;
-				m2.status = 0;
+				m1.outOfControl--;
+				if (m1.outOfControl <= 0)
+				{
+					m1.status = 0;
+					m1.jumpOffset = 0;
+				}
+			}
+			if (m2.outOfControl > 0)
+			{
+				m2.outOfControl--;
+				if (m2.outOfControl <= 0)
+				{
+					m2.status = 0;
+					m2.jumpOffset = 0;
+				}
 			}
 		}
 	}
@@ -195,6 +206,8 @@ Korokoro.prototype.updatePlayer = function(gamepad, marble)
 			marble.moveRight();
 		else if (marble.status == Marble.Status.MovingLeft)
 			marble.moveLeft();
+		else if (marble.status == Marble.Status.Jump)
+			marble.jump();
 		return;
 	}
 
@@ -277,13 +290,14 @@ Korokoro.prototype.updateStatus = function()
 				this.marble1.mesh.rotation.y -= ballPos1.velocity.y;
 				this.marble1.mesh.rotation.z -= ballPos1.velocity.z;
 				this.marble1.mesh.position.x = ballPos1.position.x;
-				this.marble1.mesh.position.y = ballPos1.position.y;
+				this.marble1.mesh.position.y = ballPos1.position.y + this.marble1.jumpOffset;
 				this.marble1.mesh.position.z = ballPos1.position.z;
 
 				var shadowPos1 = this.raceTrack.GetBallPos(this.time, 0, this.marble1.offset);
 				this.marble1.shadow.position.x = shadowPos1.position.x;
 				this.marble1.shadow.position.y = shadowPos1.position.y + 0.01;
 				this.marble1.shadow.position.z = shadowPos1.position.z;
+				this.marble1.updateShadowScale();
 			}
 			if (ballPos2 != null)
 			{
@@ -291,13 +305,14 @@ Korokoro.prototype.updateStatus = function()
 				this.marble2.mesh.rotation.y -= ballPos2.velocity.y;
 				this.marble2.mesh.rotation.z -= ballPos2.velocity.z;
 				this.marble2.mesh.position.x = ballPos2.position.x;
-				this.marble2.mesh.position.y = ballPos2.position.y;
+				this.marble2.mesh.position.y = ballPos2.position.y + this.marble2.jumpOffset;
 				this.marble2.mesh.position.z = ballPos2.position.z;
 
 				var shadowPos2= this.raceTrack.GetBallPos(this.time, 0, this.marble2.offset);
 				this.marble2.shadow.position.x = shadowPos2.position.x;
 				this.marble2.shadow.position.y = shadowPos2.position.y + 0.01;
 				this.marble2.shadow.position.z = shadowPos2.position.z;
+				this.marble2.updateShadowScale();
 			}
 		}
 	}

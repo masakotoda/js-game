@@ -1,8 +1,17 @@
 
 Marble.Status =
 {
-    MovingRight: 1,
-    MovingLeft: 2
+	MovingRight: 1,
+	MovingLeft: 2,
+	Jump: 3,
+	RightJump: 4,
+	LeftJump: 5
+}
+
+Marble.OutOfControlTime =
+{
+	collision: 30,
+	jump: 40
 }
 
 function Marble(scene, textureName)
@@ -12,8 +21,41 @@ function Marble(scene, textureName)
 	this.mesh = null;
 	this.shadow = null;
 	this.offset = 0;
+	this.jumpOffset = 0;
 	this.status = 0;
 	this.outOfControl = 0;
+}
+
+Marble.prototype.setStatus = function(status)
+{
+	if (this.outOfControl <= 0)
+	{
+		if (status == Marble.Status.Jump ||
+			status == Marble.Status.RightJump ||
+			status == Marble.Status.LeftJump)
+		{
+			this.outOfControl = Marble.OutOfControlTime.jump;
+			this.status = status;
+		}
+	}
+}
+
+Marble.prototype.updateShadowScale = function()
+{
+	if (this.jumpOffset <= 0)
+	{
+		this.shadow.scale.set(1, 1, 1);
+	}
+	else
+	{
+		var v0 = 0.075;
+		var g = 0.005;
+		var t = Marble.OutOfControlTime.jump / 2;
+		var maxJump = -0.5 * g * t * t + v0 * t;
+		var ratio = 1 - 0.5 * (this.jumpOffset / maxJump);
+
+		this.shadow.scale.set(ratio, 1, ratio);
+	}
 }
 
 Marble.prototype.moveLeftBy = function(delta)
@@ -44,6 +86,14 @@ Marble.prototype.moveRight = function()
 		this.moveRightBy(this.outOfControl * 0.0015);
 	else
 		this.moveRightBy(0.02);
+}
+
+Marble.prototype.jump = function()
+{
+	var v0 = 0.075;
+	var g = 0.005;
+	var t = Marble.OutOfControlTime.jump - this.outOfControl;
+	this.jumpOffset = -0.5 * g * t * t + v0 * t;
 }
 
 Marble.prototype.CreateMesh = function(texture)
