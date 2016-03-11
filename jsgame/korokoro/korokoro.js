@@ -91,12 +91,20 @@ Korokoro.prototype.onKeyDownFunc = function(e)
 		this.marble1.status = Marble.Status.MovingLeft;
 	else if (key == 101 && this.marble1.outOfControl <= 0) // 10 key - 5
 		this.marble1.setStatus(Marble.Status.Jump);
+	else if (key == 100 && this.marble1.outOfControl <= 0) // 10 key - 4
+		this.marble1.setStatus(Marble.Status.JumpLeft);
+	else if (key == 102 && this.marble1.outOfControl <= 0) // 10 key - 6
+		this.marble1.setStatus(Marble.Status.JumpRight);
 	else if (key == "D".charCodeAt(0) && this.marble2.outOfControl <= 0)
 		this.marble2.status = Marble.Status.MovingRight;
 	else if (key == "A".charCodeAt(0) && this.marble2.outOfControl <= 0)
 		this.marble2.status = Marble.Status.MovingLeft;
 	else if (key == "W".charCodeAt(0) && this.marble2.outOfControl <= 0)
 		this.marble2.setStatus(Marble.Status.Jump);
+	else if (key == "Q".charCodeAt(0) && this.marble2.outOfControl <= 0)
+		this.marble2.setStatus(Marble.Status.JumpLeft);
+	else if (key == "E".charCodeAt(0) && this.marble2.outOfControl <= 0)
+		this.marble2.setStatus(Marble.Status.JumpRight);
 }
 
 Korokoro.prototype.onKeyUpFunc = function(e)
@@ -110,13 +118,9 @@ Korokoro.prototype.onKeyUpFunc = function(e)
 		this.marble1.status = 0;
 	else if (key == 97 && this.marble1.status == Marble.Status.MovingLeft) // 10 key - 1
 		this.marble1.status = 0;
-	else if (key == 101) // 10 key - 5
-		this.marble1.status = 0;
 	else if (key == "D".charCodeAt(0) && this.marble2.status == Marble.Status.MovingRight)
 		this.marble2.status = 0;
 	else if (key == "A".charCodeAt(0) && this.marble2.status == Marble.Status.MovingLeft)
-		this.marble2.status = 0;
-	else if (key == "W".charCodeAt(0))
 		this.marble2.status = 0;
 }
 
@@ -200,14 +204,19 @@ Korokoro.prototype.processState = function(m1, m2)
 
 Korokoro.prototype.updatePlayer = function(gamepad, marble)
 {
+	if (marble.status == Marble.Status.Jump)
+		marble.jump();
+	else if (marble.status == Marble.Status.JumpLeft)
+		marble.jumpLeft();
+	else if (marble.status == Marble.Status.JumpRight)
+		marble.jumpRight();
+
 	if (!gamepad)
 	{
 		if (marble.status == Marble.Status.MovingRight)
 			marble.moveRight();
 		else if (marble.status == Marble.Status.MovingLeft)
 			marble.moveLeft();
-		else if (marble.status == Marble.Status.Jump)
-			marble.jump();
 		return;
 	}
 
@@ -229,18 +238,16 @@ Korokoro.prototype.updatePlayer = function(gamepad, marble)
 					marble.moveRight();
 				else if (i == this.c_buttonLeft)
 					marble.moveLeft();
-				else if (i == this.c_buttonA)
-					marble.mesh.position.z -= 0.01;
+				else if (i == this.c_buttonX)
+					marble.setStatus(Marble.Status.JumpLeft);
 				else if (i == this.c_buttonB)
-					marble.mesh.position.z += 0.01;
+					marble.setStatus(Marble.Status.JumpRight);
+				else if (i == this.c_buttonY)
+					marble.setStatus(Marble.Status.Jump);
 				else if (i == this.c_buttonUp)
 					this.cameraPos.z -= 0.01;
 				else if (i == this.c_buttonDown)
 					this.cameraPos.z += 0.01;
-				else if (i == this.c_buttonX)
-					this.cameraPos.x -= 0.01;
-				else if (i == this.c_buttonY)
-					this.cameraPos.x += 0.01;
 			}
 		}
 	}

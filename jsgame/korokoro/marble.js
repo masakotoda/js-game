@@ -4,8 +4,8 @@ Marble.Status =
 	MovingRight: 1,
 	MovingLeft: 2,
 	Jump: 3,
-	RightJump: 4,
-	LeftJump: 5
+	JumpRight: 4,
+	JumpLeft: 5
 }
 
 Marble.OutOfControlTime =
@@ -31,8 +31,8 @@ Marble.prototype.setStatus = function(status)
 	if (this.outOfControl <= 0)
 	{
 		if (status == Marble.Status.Jump ||
-			status == Marble.Status.RightJump ||
-			status == Marble.Status.LeftJump)
+			status == Marble.Status.JumpRight ||
+			status == Marble.Status.JumpLeft)
 		{
 			this.outOfControl = Marble.OutOfControlTime.jump;
 			this.status = status;
@@ -90,10 +90,28 @@ Marble.prototype.moveRight = function()
 
 Marble.prototype.jump = function()
 {
-	var v0 = 0.075;
+	var v0 = 0.1;
 	var g = 0.005;
 	var t = Marble.OutOfControlTime.jump - this.outOfControl;
 	this.jumpOffset = -0.5 * g * t * t + v0 * t;
+}
+
+Marble.prototype.jumpLeft = function()
+{
+	var v0 = 0.1;
+	var g = 0.005;
+	var t = Marble.OutOfControlTime.jump - this.outOfControl;
+	this.jumpOffset = -0.5 * g * t * t + v0 * t;
+	this.moveLeftBy(0.02);
+}
+
+Marble.prototype.jumpRight = function()
+{
+	var v0 = 0.1;
+	var g = 0.005;
+	var t = Marble.OutOfControlTime.jump - this.outOfControl;
+	this.jumpOffset = -0.5 * g * t * t + v0 * t;
+	this.moveRightBy(0.02);
 }
 
 Marble.prototype.CreateMesh = function(texture)
