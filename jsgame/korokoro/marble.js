@@ -26,13 +26,36 @@ function Marble(scene, textureName)
 	this.outOfControl = 0;
 }
 
+Marble.prototype.isJump = function(status)
+{
+	if (status == Marble.Status.Jump ||
+		status == Marble.Status.JumpRight ||
+		status == Marble.Status.JumpLeft)
+		return true;
+	else
+		return false;
+}
+
+Marble.prototype.isJumping = function()
+{
+	return this.isJump(this.status);
+}
+
+Marble.prototype.isCollidingTo = function(other)
+{
+	var radius = 0.16;
+	var dx = this.mesh.position.x - other.mesh.position.x;
+	var dy = this.mesh.position.y - other.mesh.position.y;
+	var dz = this.mesh.position.z - other.mesh.position.z;
+	var d2 = dx*dx + dy*dy + dz*dz;
+	return (d2 - (radius*1.8)*(radius*1.8) <= 0) // Two balls merge for a bit. It looks a little more realistic collision.
+}
+
 Marble.prototype.setStatus = function(status)
 {
 	if (this.outOfControl <= 0)
 	{
-		if (status == Marble.Status.Jump ||
-			status == Marble.Status.JumpRight ||
-			status == Marble.Status.JumpLeft)
+		if (this.isJump(status))
 		{
 			this.outOfControl = Marble.OutOfControlTime.jump;
 			this.status = status;

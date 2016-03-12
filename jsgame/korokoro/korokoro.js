@@ -157,12 +157,7 @@ Korokoro.prototype.processState = function(m1, m2)
 	{
 		if (m1.outOfControl <= 0 && m2.outOfControl <=0)
 		{
-			var radius = 0.16;
-			var dx = m1.mesh.position.x - m2.mesh.position.x;
-			var dy = m1.mesh.position.y - m2.mesh.position.y;
-			var dz = m1.mesh.position.z - m2.mesh.position.z;
-			var d2 = dx*dx + dy*dy + dz*dz;
-			if (d2 - (radius*1.8)*(radius*1.8) <= 0) // Two balls merge for a bit. It looks a little more realistic collision.
+			if (m1.isCollidingTo(m2))
 			{
 				if (m1.offset < m2.offset)
 				{
@@ -180,6 +175,26 @@ Korokoro.prototype.processState = function(m1, m2)
 		}
 		else
 		{
+			if (m1.isJumping() && m2.isJumping())
+			{
+				if (m1.isCollidingTo(m2))
+				{
+					if (m1.offset < m2.offset)
+					{
+						if (m1.status != Marble.Status.Jump)
+							m1.status = Marble.Status.JumpLeft;
+						if (m2.status != Marble.Status.Jump)
+							m2.status = Marble.Status.JumpRight;
+					}
+					else
+					{
+						if (m1.status != Marble.Status.Jump)
+							m1.status = Marble.Status.JumpRight;
+						if (m2.status != Marble.Status.Jump)
+							m2.status = Marble.Status.JumpLeft;
+					}
+				}
+			}
 			if (m1.outOfControl > 0)
 			{
 				m1.outOfControl--;
