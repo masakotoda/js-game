@@ -71,7 +71,7 @@ Marble.prototype.updateShadowScale = function()
 	}
 	else
 	{
-		var v0 = 0.075;
+		var v0 = 0.1;
 		var g = 0.005;
 		var t = Marble.OutOfControlTime.jump / 2;
 		var maxJump = -0.5 * g * t * t + v0 * t;

@@ -15,6 +15,7 @@ function Korokoro()
 	this.scene;
 	this.sceneTwin;
 	this.renderer;
+	this.light;
 	this.camera;
 	this.cameraPos = { x: 0, y: 1.3333, z: 3.3333 };
 
@@ -23,6 +24,7 @@ function Korokoro()
 
 	this.marble1;
 	this.marble2;
+	this.titleText;
 
 	this.raceTrack;
 	this.run = false;
@@ -50,12 +52,12 @@ Korokoro.prototype.onLoadFunc = function()
 	this.camera.position.set(this.cameraPos.x, this.cameraPos.y, this.cameraPos.z);
 
 	// Create a directional light to show off the object 
-	var light = new THREE.DirectionalLight(0xffffff, 1.5); 
-	light.position.set(0, 1, 0);
+	this.light = new THREE.DirectionalLight(0xffffff, 1.5);
+	this.light.position.set(0, 1, 0.25);
 
 	//light.castShadow = true; // According to the reference, it is expensive...
 
-	this.scene.add(light); 
+	this.scene.add(this.light);
 	this.sceneTwin = this.scene.clone(); // For now, I'm not placing anything in twin.
 
 	// Create a shaded, texture-mapped cube, objects and add them to the scene 
@@ -75,6 +77,12 @@ Korokoro.prototype.onLoadFunc = function()
 
 	this.raceTrack = new RaceTrack(this.scene);
 	this.raceTrack.Init();
+
+	this.titleText = new TitleText(this.scene);
+	var fontLoader = new THREE.FontLoader();
+	fontLoader.load('fonts/' + 'Trebuchet MS_Regular.js', function (font) {
+		_game.titleText.init(font);
+	});
 
 	//var cube = new RandomCube(this.scene);
 	//cube.Init();
@@ -113,7 +121,7 @@ Korokoro.prototype.onKeyUpFunc = function(e)
 	// (e.g. Left down -> Right down -> Left up -> Left down)
 	var key = e.keyCode ? e.keyCode : e.which;
 	if (key == 32) // Space key
-		this.run = true;
+		this.startGame();
 	else if (key == 99 && this.marble1.status == Marble.Status.MovingRight) // 10 key - 3
 		this.marble1.status = 0;
 	else if (key == 97 && this.marble1.status == Marble.Status.MovingLeft) // 10 key - 1
@@ -122,6 +130,40 @@ Korokoro.prototype.onKeyUpFunc = function(e)
 		this.marble2.status = 0;
 	else if (key == "A".charCodeAt(0) && this.marble2.status == Marble.Status.MovingLeft)
 		this.marble2.status = 0;
+}
+
+Korokoro.prototype.startGame = function()
+{
+	if (!this.run)
+	{
+		this.run = true;
+		this.scene.remove(this.titleText.mesh);
+	}
+}
+
+Korokoro.prototype.scanGamepad = function(gamepad, marble)
+{
+	if (!gamepad)
+		return;
+
+	var buttons = gamepad.buttons;
+	for (var i = 0; i < buttons.length; i++)
+	{
+		if (this.isButtonPressed(buttons[i]))
+		{
+			if (marble.outOfControl <= 0)
+			{
+				if (i == this.c_buttonStart)
+					this.startGame();
+				else if (i == this.c_buttonX)
+					marble.setStatus(Marble.Status.JumpLeft);
+				else if (i == this.c_buttonB)
+					marble.setStatus(Marble.Status.JumpRight);
+				else if (i == this.c_buttonY)
+					marble.setStatus(Marble.Status.Jump);
+			}
+		}
+	}
 }
 
 Korokoro.prototype.scanGamepads = function()
@@ -137,6 +179,9 @@ Korokoro.prototype.scanGamepads = function()
 
 		if (gamepads.length > 1)
 			this.gamepad2 = gamepads[1];
+
+		this.scanGamepad(this.gamepad1, this.marble1);
+		this.scanGamepad(this.gamepad2, this.marble2);
 	}
 }
 
@@ -225,44 +270,22 @@ Korokoro.prototype.updatePlayer = function(gamepad, marble)
 		marble.jumpLeft();
 	else if (marble.status == Marble.Status.JumpRight)
 		marble.jumpRight();
+	else if (marble.status == Marble.Status.MovingRight)
+		marble.moveRight();
+	else if (marble.status == Marble.Status.MovingLeft)
+		marble.moveLeft();
 
-	if (!gamepad)
+	if (gamepad && marble.outOfControl <= 0)
 	{
-		if (marble.status == Marble.Status.MovingRight)
-			marble.moveRight();
-		else if (marble.status == Marble.Status.MovingLeft)
-			marble.moveLeft();
-		return;
-	}
-
-	var buttons = gamepad.buttons;
-	for (var i = 0; i < buttons.length; i++)
-	{
-		if (this.isButtonPressed(buttons[i]))
+		var buttons = gamepad.buttons;
+		for (var i = 0; i < buttons.length; i++)
 		{
-			if (marble.outOfControl > 0)
-			{
-				if (marble.status == Marble.Status.MovingRight)
-					marble.moveRight();
-				else if (marble.status == Marble.Status.MovingLeft)
-					marble.moveLeft();
-			}
-			else
+			if (this.isButtonPressed(buttons[i]))
 			{
 				if (i == this.c_buttonRight)
 					marble.moveRight();
 				else if (i == this.c_buttonLeft)
 					marble.moveLeft();
-				else if (i == this.c_buttonX)
-					marble.setStatus(Marble.Status.JumpLeft);
-				else if (i == this.c_buttonB)
-					marble.setStatus(Marble.Status.JumpRight);
-				else if (i == this.c_buttonY)
-					marble.setStatus(Marble.Status.Jump);
-				else if (i == this.c_buttonUp)
-					this.cameraPos.z -= 0.01;
-				else if (i == this.c_buttonDown)
-					this.cameraPos.z += 0.01;
 			}
 		}
 	}
@@ -304,6 +327,7 @@ Korokoro.prototype.updateStatus = function()
 		}
 		else
 		{
+			this.light.position.set(0, 1, 0);
 			this.camera.position.set(camPosition.x, camPosition.y, camPosition.z);
 			this.camera.lookAt(camFocus);
 			if (ballPos1 != null)
@@ -340,6 +364,10 @@ Korokoro.prototype.updateStatus = function()
 	}
 	else
 	{
+		if (this.titleText.mesh)
+		{
+			this.titleText.mesh.rotation.x -= 0.01;
+		}
 		//this.camera.position.set(this.cameraPos.x, this.cameraPos.y, this.cameraPos.z);
 		//this.camera.lookAt(this.marble1.mesh.position)
 	}

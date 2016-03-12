@@ -217,8 +217,8 @@ RaceTrack.prototype.Init = function()
 
 RaceTrack.prototype.GetCameraPos = function(t)
 {
-	var y = 2.3333;
-	var delay = 3.3333;
+	var y = 3.3333;
+	var delay = 4.3333;
 	var radius = 0;
 	var offset = 0;
 	return this.GetPos(t, y, radius, delay, offset);
