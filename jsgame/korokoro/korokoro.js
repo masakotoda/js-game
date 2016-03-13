@@ -25,6 +25,8 @@ function Korokoro()
 	this.marble1;
 	this.marble2;
 	this.titleText;
+	this.letters = [];
+	this.letterTextures = [];
 
 	this.raceTrack;
 	this.run = false;
@@ -83,6 +85,47 @@ Korokoro.prototype.onLoadFunc = function()
 	fontLoader.load('fonts/' + 'Trebuchet MS_Regular.js', function (font) {
 		_game.titleText.init(font);
 	});
+
+	for (var i = 0; i < 26; i++)
+	{
+		var imagePath = 'images/';
+		var chr = String.fromCharCode(97 + i);
+		texLoader.load(imagePath + chr + '.png', function(texture) {
+			var n = texture.image.currentSrc.indexOf(imagePath);
+			if (n > 0)
+			{
+				var chr = texture.image.currentSrc[n + imagePath.length];
+				_game.letterTextures[chr] = texture;
+			}
+			var ready = true;
+			for (var j = 0; j < 26; j++)
+			{
+				var chr = String.fromCharCode(97 + j);
+				if (!_game.letterTextures[chr])
+					ready = false;
+			}
+			if (ready)
+			{
+				var phrase = "refrigerator";
+				var factor = _game.raceTrack.getLength() / phrase.length;
+				for (var j = 0; j < phrase.length; j++)
+				{
+					var letter = _game.letters[j] = new LetterBox(_game.scene, phrase[j]);
+					var texture = _game.letterTextures[phrase[j]];
+					letter.init(texture, phrase[j]);
+					var pos = _game.raceTrack.GetBallPos((j + 1) * factor, 1.0, 0).position;
+					letter.mesh.position.x = pos.x;
+					letter.mesh.position.y = pos.y;
+					letter.mesh.position.z = pos.z;
+
+					var shadowPos = _game.raceTrack.GetBallPos((j + 1) * factor, 0, 0);
+					letter.shadow.position.x = shadowPos.position.x;
+					letter.shadow.position.y = shadowPos.position.y + 0.05;
+					letter.shadow.position.z = shadowPos.position.z;
+				}
+			}
+		});
+	}
 
 	//var cube = new RandomCube(this.scene);
 	//cube.Init();
@@ -200,6 +243,16 @@ Korokoro.prototype.processState = function(m1, m2)
 {
 	if (m1.mesh && m2.mesh)
 	{
+		var letter1 = m1.hitTest(this.letters);
+		if (letter1)
+		{
+			letter1.mesh.position.y += 0.1;
+		}
+		var letter2 = m2.hitTest(this.letters);
+		if (letter2)
+		{
+			letter2.mesh.position.y += 0.1;
+		}
 		if (m1.outOfControl <= 0 && m2.outOfControl <=0)
 		{
 			if (m1.isCollidingTo(m2))

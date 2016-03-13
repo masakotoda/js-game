@@ -13,7 +13,7 @@ TitleText.prototype.init = function(font)
 	var bevelSize = 0.01;
 	var bevelEnabled = true;
 	var curveSegments = 4;
-	
+
 	var textGeo = new THREE.TextGeometry("welcome to koro koro!",
 		{
 			font: font,
@@ -36,7 +36,7 @@ TitleText.prototype.init = function(font)
 	this.mesh = new THREE.Mesh(textGeo, material);
 
 	this.mesh.position.x = -1;
-	this.mesh.position.y = 1;
+	this.mesh.position.y = 2;
 	this.mesh.position.z = 0;
 
 	this.mesh.rotation.x = 0;

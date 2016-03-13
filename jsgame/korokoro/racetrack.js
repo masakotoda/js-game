@@ -4,6 +4,7 @@ function RaceTrack(scene)
 	this.scene = scene;
 	this.object = null;
 	this.raycaster = new THREE.Raycaster();
+	this.distances = [];
 }
 
 RaceTrack.prototype.Init = function()
@@ -157,6 +158,17 @@ RaceTrack.prototype.Init = function()
 		index++;
 	}
 
+	this.distances[0] = 8.0;
+	this.distances[1] = 4*Math.PI;
+	this.distances[2] = 2*Math.PI;
+	this.distances[3] = 1.75*Math.PI; // It actually 1*PI, but it's pretty tight curve. It looks more natural to be slower (simulate longer distance)
+	this.distances[4] = 6.0;
+	this.distances[5] = 1.75*Math.PI; // It actually 1*PI, but it's pretty tight curve. It looks more natural to be slower (simulate longer distance)
+	this.distances[6] = 1;
+	this.distances[7] = 1.75*Math.PI; // It actually 1*PI, but it's pretty tight curve. It looks more natural to be slower (simulate longer distance)
+	this.distances[8] = 3;
+	this.distances[9] = 3*Math.PI;
+
 	var geom = new THREE.Geometry();
 	for (var i = 0; i < index; i++)
 	{
@@ -272,25 +284,13 @@ RaceTrack.prototype.GetPos = function(t, y, radius, delay, offset)
 {
 	t -= delay;
 
-	var distances = [];
-	distances[0] = 8.0;
-	distances[1] = 4*Math.PI;
-	distances[2] = 2*Math.PI;
-	distances[3] = 1.75*Math.PI; // It actually 1*PI, but it's pretty tight curve. It looks more natural to be slower (simulate longer distance)
-	distances[4] = 6.0;
-	distances[5] = 1.75*Math.PI; // It actually 1*PI, but it's pretty tight curve. It looks more natural to be slower (simulate longer distance)
-	distances[6] = 1;
-	distances[7] = 1.75*Math.PI; // It actually 1*PI, but it's pretty tight curve. It looks more natural to be slower (simulate longer distance)
-	distances[8] = 3;
-	distances[9] = 3*Math.PI;
-
 	var accum = [];
-	for (var i = 0; i < distances.length; i++)
+	for (var i = 0; i < this.distances.length; i++)
 	{
 		accum[i] = 0;
 		for (var j = 0; j < i; j++)
 		{
-			accum[i] += distances[j];
+			accum[i] += this.distances[j];
 		}
 	}
 
@@ -301,87 +301,87 @@ RaceTrack.prototype.GetPos = function(t, y, radius, delay, offset)
 		var z = 0;
 		var v_x = 0;
 		var v_z = 0;
-		if (t < accum[0] + distances[0])
+		if (t < accum[0] + this.distances[0])
 		{
 			x = offset;
 			z = -t;
 			v_x = 0.05;
 			v_z = 0;
 		}
-		else if (t < accum[1] + distances[1])
+		else if (t < accum[1] + this.distances[1])
 		{
-			var theta = -1 - (t - accum[1]) / distances[1];
+			var theta = -1 - (t - accum[1]) / this.distances[1];
 			var r = (4 - offset);
 			x = r*Math.cos(Math.PI*theta)+4;
 			z = -1*(r*Math.sin(Math.PI*theta)+8);
-			v_x = 0.05*Math.cos(Math.PI*(t - accum[1]) / distances[1]);
-			v_z = 0.05*Math.sin(Math.PI*(t - accum[1]) / distances[1]);
+			v_x = 0.05*Math.cos(Math.PI*(t - accum[1]) / this.distances[1]);
+			v_z = 0.05*Math.sin(Math.PI*(t - accum[1]) / this.distances[1]);
 		}
-		else if (t < accum[2] + distances[2])
+		else if (t < accum[2] + this.distances[2])
 		{
-			var theta = -(t - accum[2]) / distances[2];
+			var theta = -(t - accum[2]) / this.distances[2];
 			var r = (2 - offset);
 			x = r*Math.cos(Math.PI*theta)+6;
 			z = -1*(r*Math.sin(Math.PI*theta)+8);
-			v_x = -0.05*Math.cos(Math.PI*(t - accum[2]) / distances[2]);
-			v_z = -0.05*Math.sin(Math.PI*(t - accum[2]) / distances[2]);
+			v_x = -0.05*Math.cos(Math.PI*(t - accum[2]) / this.distances[2]);
+			v_z = -0.05*Math.sin(Math.PI*(t - accum[2]) / this.distances[2]);
 		}
-		else if (t < accum[3] + distances[3])
+		else if (t < accum[3] + this.distances[3])
 		{
-			var theta = (t - accum[3]) / distances[3];
+			var theta = (t - accum[3]) / this.distances[3];
 			var r = (1 + offset);
 			x = r*Math.cos(Math.PI*theta)+3;
 			z = -1*(r*Math.sin(Math.PI*theta)+8);
-			v_x = 0.1*Math.cos(Math.PI*(t - accum[3]) / distances[3]);
-			v_z = -0.1*Math.sin(Math.PI*(t - accum[3]) / distances[3]);
+			v_x = 0.1*Math.cos(Math.PI*(t - accum[3]) / this.distances[3]);
+			v_z = -0.1*Math.sin(Math.PI*(t - accum[3]) / this.distances[3]);
 		}
-		else if (t < accum[4] + distances[4])
+		else if (t < accum[4] + this.distances[4])
 		{
 			x = 2 - offset;
-			z = -2 - (distances[4] - (t - accum[4]));
+			z = -2 - (this.distances[4] - (t - accum[4]));
 			v_x = -0.05;
 			v_z = 0;
 		}
-		else if (t < accum[5] + distances[5])
+		else if (t < accum[5] + this.distances[5])
 		{
-			var theta = 1 + (t - accum[5]) / distances[5];
+			var theta = 1 + (t - accum[5]) / this.distances[5];
 			var r = 1 + offset;
 			x = r*Math.cos(Math.PI*theta)+3;
 			z = -1*(r*Math.sin(Math.PI*theta)+2);
-			v_x = -0.1*Math.cos(Math.PI*(t - accum[5]) / distances[5]);
-			v_z = 0.1*Math.sin(Math.PI*(t - accum[5]) / distances[5]);
+			v_x = -0.1*Math.cos(Math.PI*(t - accum[5]) / this.distances[5]);
+			v_z = 0.1*Math.sin(Math.PI*(t - accum[5]) / this.distances[5]);
 		}
-		else if (t < accum[6] + distances[6])
+		else if (t < accum[6] + this.distances[6])
 		{
 			x = 4 + offset;
 			z = - (t - accum[6] + 2);
 			v_x = 0.05;
 			v_z = 0;
 		}
-		else if (t < accum[7] + distances[7])
+		else if (t < accum[7] + this.distances[7])
 		{
-			var theta = -1 - (t - accum[7]) / distances[7];
+			var theta = -1 - (t - accum[7]) / this.distances[7];
 			var r = 1 - offset;
 			x = r*Math.cos(Math.PI*theta)+5;
 			z = -1*(r*Math.sin(Math.PI*theta)+3);
-			v_x = 0.1*Math.cos(Math.PI*(t - accum[7]) / distances[7]);
-			v_z = 0.1*Math.sin(Math.PI*(t - accum[7]) / distances[7]);
+			v_x = 0.1*Math.cos(Math.PI*(t - accum[7]) / this.distances[7]);
+			v_z = 0.1*Math.sin(Math.PI*(t - accum[7]) / this.distances[7]);
 		}
-		else if (t < accum[8] + distances[8])
+		else if (t < accum[8] + this.distances[8])
 		{
 			x = 6 - offset;
-			z = -(distances[8] - (t - accum[8]));
+			z = -(this.distances[8] - (t - accum[8]));
 			v_x = -0.05;
 			v_z = 0;
 		}
-		else if (t < accum[9] + distances[9])
+		else if (t < accum[9] + this.distances[9])
 		{
-			var theta = -(t - accum[9]) / distances[9];
+			var theta = -(t - accum[9]) / this.distances[9];
 			var r = 3 - offset;
 			x = r*Math.cos(Math.PI*theta)+3;
 			z = -1*(r*Math.sin(Math.PI*theta));
-			v_x = -0.05*Math.cos(Math.PI*(t - accum[9]) / distances[9]);
-			v_z = -0.05*Math.sin(Math.PI*(t - accum[9]) / distances[9]);
+			v_x = -0.05*Math.cos(Math.PI*(t - accum[9]) / this.distances[9]);
+			v_z = -0.05*Math.sin(Math.PI*(t - accum[9]) / this.distances[9]);
 		}
 		else
 		{
@@ -390,7 +390,7 @@ RaceTrack.prototype.GetPos = function(t, y, radius, delay, offset)
 		
 		if (startOver)
 		{
-			t -= (accum[9] + distances[9]);
+			t -= (accum[9] + this.distances[9]);
 		}
 		else
 		{
@@ -400,4 +400,14 @@ RaceTrack.prototype.GetPos = function(t, y, radius, delay, offset)
 				return { position: new THREE.Vector3(x, y, z) };
 		}
 	}
+}
+
+RaceTrack.prototype.getLength = function()
+{
+	var len = 0;
+	for (var i = 0; i < this.distances.length; i++)
+	{
+		len += this.distances[i];
+	}
+	return len;
 }

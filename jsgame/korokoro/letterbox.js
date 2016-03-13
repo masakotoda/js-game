@@ -1,0 +1,51 @@
+
+function LetterBox(scene, letter)
+{
+	this.scene = scene;
+	this.letter = letter;
+	this.mesh;
+	this.shadow;
+}
+
+LetterBox.prototype.init = function(texture)
+{
+	var material = new THREE.MeshPhongMaterial({ map: texture });
+	var geometry = new THREE.CubeGeometry(0.25, 0.25, 0.25); 
+	this.mesh = new THREE.Mesh(geometry, material); 
+	this.mesh.rotation.x = Math.PI / 5; 
+	this.mesh.rotation.y = Math.PI / 5; 
+	this.mesh.position.x = 0;
+	this.mesh.position.y = 0;
+	this.mesh.position.z = -1.0;
+	this.scene.add(this.mesh);
+
+	this.createShadow();
+	this.scene.add(this.shadow);
+}
+
+LetterBox.prototype.createShadow = function()
+{
+	var radius = 0.25;
+	var segment = 4;
+
+	var material = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.25 });
+	var geometry = new THREE.Geometry();
+
+	for (var i = 0; i < segment; i++)
+	{
+		var vertex = new THREE.Vector3(
+				radius * Math.cos(2*Math.PI*i/segment), 
+				0, 
+				-radius * Math.sin(2*Math.PI*i/segment));
+		geometry.vertices.push(vertex);
+	}
+	geometry.vertices.push(new THREE.Vector3(0, 0, 0));
+
+	for (var i = 0; i < segment - 1; i++)
+	{
+		geometry.faces.push(new THREE.Face3(segment, i, i + 1));
+	}
+	geometry.faces.push(new THREE.Face3(segment, segment - 1, 0));
+
+	this.shadow = new THREE.Mesh(geometry, material);
+}

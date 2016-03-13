@@ -26,6 +26,22 @@ function Marble(scene, textureName)
 	this.outOfControl = 0;
 }
 
+Marble.prototype.hitTest = function(letters)
+{
+	for (var i = 0; i < letters.length; i++)
+	{
+		var radius = 0.16;
+		var other = letters[i];
+		var dx = this.mesh.position.x - other.mesh.position.x;
+		var dy = this.mesh.position.y - other.mesh.position.y;
+		var dz = this.mesh.position.z - other.mesh.position.z;
+		var d2 = dx*dx + dy*dy + dz*dz;
+		if (d2 - (radius*1.8)*(radius*1.8) <= 0) // Two balls merge for a bit. It looks a little more realistic collision.
+			return other;
+	}
+	return null;
+}
+
 Marble.prototype.isJump = function(status)
 {
 	if (status == Marble.Status.Jump ||
