@@ -229,7 +229,7 @@ Marble.prototype.CreateShadow = function()
 	this.shadow = new THREE.Mesh(geometry, material);
 }
 
-Marble.prototype.Init = function(texture)
+Marble.prototype.init = function(texture)
 {
 	this.CreateShadow();
 	this.scene.add(this.shadow);
@@ -238,7 +238,7 @@ Marble.prototype.Init = function(texture)
 	this.scene.add(this.mesh);
 }
 
-Marble.prototype.SetInitialPos = function(x)
+Marble.prototype.setInitialPos = function(x)
 {
 	this.mesh.position.x = x;
 	this.shadow.position.x = x;

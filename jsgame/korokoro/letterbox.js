@@ -78,3 +78,13 @@ LetterBox.prototype.removeFromScene = function(texture)
 	this.mesh.material.map = texture;
 	this.mesh.material.needsUpdate = true;
 }
+
+LetterBox.prototype.setPos = function(pos, shadowPos)
+{
+	this.mesh.position.x = pos.x;
+	this.mesh.position.y = pos.y;
+	this.mesh.position.z = pos.z;
+	this.shadow.position.x = shadowPos.position.x;
+	this.shadow.position.y = shadowPos.position.y + 0.05;
+	this.shadow.position.z = shadowPos.position.z;
+}

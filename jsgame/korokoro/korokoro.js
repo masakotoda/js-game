@@ -1,17 +1,7 @@
 
+// Constructor
 function Korokoro()
 {
-	this.c_buttonA = 0;
-	this.c_buttonB = 1;
-	this.c_buttonX = 2;
-	this.c_buttonY = 3;
-	this.c_buttonBack = 8;
-	this.c_buttonStart = 9;
-	this.c_buttonUp = 12;
-	this.c_buttonDown = 13;
-	this.c_buttonLeft = 14;
-	this.c_buttonRight = 15;
-
 	this.scene;
 	this.sceneTwin;
 	this.renderer;
@@ -35,6 +25,29 @@ function Korokoro()
 	this.then;
 }
 
+// Enums / constants
+Korokoro.Button =
+{
+	A: 0,
+	B: 1,
+	X: 2,
+	Y: 3,
+	Back: 8,
+	Start: 9,
+	Up: 12,
+	Down: 13,
+	Left: 14,
+	Right: 15
+}
+
+Korokoro.Const =
+{
+	msecPerFrame: 10,
+	imagePath: 'images/',
+	alphabet: 26
+}
+
+// Static functions, callback functions
 Korokoro.getRandom = function(min, max)
 {
   return Math.random() * (max - min) + min;
@@ -61,6 +74,42 @@ Korokoro.size = function(obj)
 	return size;
 }
 
+Korokoro.onLetterTextureLoaded = function(texture)
+{
+	var n = texture.image.currentSrc.indexOf(Korokoro.Const.imagePath);
+	if (n <= 0)
+		return;
+
+	var chr = texture.image.currentSrc[n + Korokoro.Const.imagePath.length];
+	_game.letterTextures[chr] = texture;
+
+	var ready = Korokoro.size(_game.letterTextures) == Korokoro.Const.alphabet;
+	if (ready)
+	{
+		var phrase = _game.marble1.phrase + _game.marble2.phrase;
+		var remaining = phrase;
+		var factor = _game.raceTrack.getLength() / phrase.length;
+		for (var j = 0; j < phrase.length; j++)
+		{
+			var k = Korokoro.getRandomInt(0, remaining.length);
+			var l = remaining[k];
+			remaining = remaining.slice(0, k) + remaining.slice(k + 1)
+
+			var letter = new LetterBox(_game.scene, l);
+			var texture = _game.letterTextures[l];
+			letter.init(texture, l);
+
+			var offset = Korokoro.getRandom(-0.75, 0.75);
+			var pos = _game.raceTrack.GetBallPos((j + 0.5) * factor, 1.0, offset).position;
+			var shadowPos = _game.raceTrack.GetBallPos((j + 0.5) * factor, 0, offset);
+			letter.setPos(pos, shadowPos);
+
+			_game.letters[j] = letter;
+		}
+	}
+}
+
+// Member functions
 Korokoro.prototype.onLoadFunc = function() 
 {
 	// Grab our container div 
@@ -93,68 +142,39 @@ Korokoro.prototype.onLoadFunc = function()
 	// Create a shaded, texture-mapped cube, objects and add them to the scene 
 	var texLoader = new THREE.TextureLoader();
 
+	// Create marble1
 	this.marble1 = new Marble(this.scene, 'Player 1', 'images/texture1.png');
 	this.marble1.setPhrase("banana");
 	texLoader.load(this.marble1.textureName, function(texture) {
-		_game.marble1.Init(texture);
-		_game.marble1.SetInitialPos(0.5);
+		_game.marble1.init(texture);
+		_game.marble1.setInitialPos(0.5);
 	});
 
+	// Create marble2
 	this.marble2 = new Marble(this.scene, 'Player 2', 'images/texture2.png');
 	this.marble2.setPhrase("monkey");
 	texLoader.load(this.marble2.textureName, function(texture) {
-		_game.marble2.Init(texture);
-		_game.marble2.SetInitialPos(-0.5);
+		_game.marble2.init(texture);
+		_game.marble2.setInitialPos(-0.5);
 	});
 
+	// Create racetrack
 	this.raceTrack = new RaceTrack(this.scene);
-	this.raceTrack.Init();
+	this.raceTrack.init();
 
+	// Create titleText
 	this.titleText = new TitleText(this.scene);
 	var fontLoader = new THREE.FontLoader();
 	fontLoader.load('fonts/' + 'Trebuchet MS_Regular.js', function (font) {
 		_game.titleText.init(font);
 	});
 
-	var alphabet = 26;
-	for (var i = 0; i < alphabet; i++)
+	// Create letter boxes
+	for (var i = 0; i < Korokoro.Const.alphabet; i++)
 	{
-		var imagePath = 'images/';
 		var chr = String.fromCharCode(97 + i);
-		texLoader.load(imagePath + chr + '.png', function(texture) {
-			var n = texture.image.currentSrc.indexOf(imagePath);
-			if (n > 0)
-			{
-				var chr = texture.image.currentSrc[n + imagePath.length];
-				_game.letterTextures[chr] = texture;
-			}
-			var ready = Korokoro.size(_game.letterTextures) == alphabet;
-			if (ready)
-			{
-				var phrase = _game.marble1.phrase + _game.marble2.phrase;
-				var remaining = phrase;
-				var factor = _game.raceTrack.getLength() / phrase.length;
-				for (var j = 0; j < phrase.length; j++)
-				{
-					var k = Korokoro.getRandomInt(0, remaining.length);
-					var l = remaining[k];
-					remaining = remaining.slice(0, k) + remaining.slice(k + 1)
-					_game.letters[j] = new LetterBox(_game.scene, l);
-					var letter = _game.letters[j];
-					var texture = _game.letterTextures[l];
-					var offset = Korokoro.getRandom(-0.75, 0.75);
-					letter.init(texture, l);
-					var pos = _game.raceTrack.GetBallPos((j + 0.5) * factor, 1.0, offset).position;
-					letter.mesh.position.x = pos.x;
-					letter.mesh.position.y = pos.y;
-					letter.mesh.position.z = pos.z;
-
-					var shadowPos = _game.raceTrack.GetBallPos((j + 0.5) * factor, 0, offset);
-					letter.shadow.position.x = shadowPos.position.x;
-					letter.shadow.position.y = shadowPos.position.y + 0.05;
-					letter.shadow.position.z = shadowPos.position.z;
-				}
-			}
+		texLoader.load(Korokoro.Const.imagePath + chr + '.png', function(texture) {
+			Korokoro.onLetterTextureLoaded(texture);
 		});
 	}
 
@@ -206,16 +226,6 @@ Korokoro.prototype.onKeyUpFunc = function(e)
 		this.marble2.status = 0;
 }
 
-Korokoro.prototype.startGame = function()
-{
-	if (!this.run)
-	{
-		this.run = true;
-		this.updateStatusText("");
-		this.scene.remove(this.titleText.mesh);
-	}
-}
-
 Korokoro.prototype.scanGamepad = function(gamepad, marble)
 {
 	if (!gamepad)
@@ -228,13 +238,13 @@ Korokoro.prototype.scanGamepad = function(gamepad, marble)
 		{
 			if (marble.outOfControl <= 0)
 			{
-				if (i == this.c_buttonStart)
+				if (i == Korokoro.Button.Start)
 					this.startGame();
-				else if (i == this.c_buttonX)
+				else if (i == Korokoro.Button.X)
 					marble.setStatus(Marble.Status.JumpLeft);
-				else if (i == this.c_buttonB)
+				else if (i == Korokoro.Button.B)
 					marble.setStatus(Marble.Status.JumpRight);
-				else if (i == this.c_buttonY)
+				else if (i == Korokoro.Button.Y)
 					marble.setStatus(Marble.Status.Jump);
 			}
 		}
@@ -401,9 +411,9 @@ Korokoro.prototype.updatePlayer = function(gamepad, marble)
 		{
 			if (this.isButtonPressed(buttons[i]))
 			{
-				if (i == this.c_buttonRight)
+				if (i == Korokoro.Button.Right)
 					marble.moveRight();
-				else if (i == this.c_buttonLeft)
+				else if (i == Korokoro.Button.Left)
 					marble.moveLeft();
 			}
 		}
@@ -427,7 +437,7 @@ Korokoro.prototype.removeGamepad = function(gamepad)
 Korokoro.prototype.updateStatus = function()
 {
 	var now = Date.now();
-	if (this.then != null && now - this.then < 10)
+	if (this.then != null && now - this.then < Korokoro.Const.msecPerFrame)
 	{
 		return;
 	}
@@ -502,4 +512,14 @@ Korokoro.prototype.updateStatus = function()
 	this.renderer.render(this.sceneTwin, this.camera);
 	this.renderer.clearDepth();
 	this.renderer.render(this.scene, this.camera);
+}
+
+Korokoro.prototype.startGame = function()
+{
+	if (!this.run)
+	{
+		this.run = true;
+		this.updateStatusText("");
+		this.scene.remove(this.titleText.mesh);
+	}
 }

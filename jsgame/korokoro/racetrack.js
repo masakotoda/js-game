@@ -7,7 +7,7 @@ function RaceTrack(scene)
 	this.distances = [];
 }
 
-RaceTrack.prototype.Init = function()
+RaceTrack.prototype.init = function()
 {
 	var v = [];
 	var index = 0;
