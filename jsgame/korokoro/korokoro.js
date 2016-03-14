@@ -31,6 +31,34 @@ function Korokoro()
 	this.raceTrack;
 	this.run = false;
 	this.time = 0;
+
+	this.then;
+}
+
+Korokoro.getRandom = function(min, max)
+{
+  return Math.random() * (max - min) + min;
+}
+
+Korokoro.getRandomInt = function(min, max)
+{
+  return Math.floor(Math.random() * (max - min)) + min;
+}
+
+Korokoro.getRandomIntInclusive = function(min, max)
+{
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+Korokoro.size = function(obj)
+{
+	var size = 0, key;
+	for (key in obj)
+	{
+		if (obj.hasOwnProperty(key))
+			size++;
+	}
+	return size;
 }
 
 Korokoro.prototype.onLoadFunc = function() 
@@ -65,13 +93,15 @@ Korokoro.prototype.onLoadFunc = function()
 	// Create a shaded, texture-mapped cube, objects and add them to the scene 
 	var texLoader = new THREE.TextureLoader();
 
-	this.marble1 = new Marble(this.scene, 'images/texture1.png');
+	this.marble1 = new Marble(this.scene, 'Player 1', 'images/texture1.png');
+	this.marble1.setPhrase("banana");
 	texLoader.load(this.marble1.textureName, function(texture) {
 		_game.marble1.Init(texture);
 		_game.marble1.SetInitialPos(0.5);
 	});
 
-	this.marble2 = new Marble(this.scene, 'images/texture2.png');
+	this.marble2 = new Marble(this.scene, 'Player 2', 'images/texture2.png');
+	this.marble2.setPhrase("monkey");
 	texLoader.load(this.marble2.textureName, function(texture) {
 		_game.marble2.Init(texture);
 		_game.marble2.SetInitialPos(-0.5);
@@ -86,7 +116,8 @@ Korokoro.prototype.onLoadFunc = function()
 		_game.titleText.init(font);
 	});
 
-	for (var i = 0; i < 26; i++)
+	var alphabet = 26;
+	for (var i = 0; i < alphabet; i++)
 	{
 		var imagePath = 'images/';
 		var chr = String.fromCharCode(97 + i);
@@ -97,28 +128,28 @@ Korokoro.prototype.onLoadFunc = function()
 				var chr = texture.image.currentSrc[n + imagePath.length];
 				_game.letterTextures[chr] = texture;
 			}
-			var ready = true;
-			for (var j = 0; j < 26; j++)
-			{
-				var chr = String.fromCharCode(97 + j);
-				if (!_game.letterTextures[chr])
-					ready = false;
-			}
+			var ready = Korokoro.size(_game.letterTextures) == alphabet;
 			if (ready)
 			{
-				var phrase = "refrigerator";
+				var phrase = _game.marble1.phrase + _game.marble2.phrase;
+				var remaining = phrase;
 				var factor = _game.raceTrack.getLength() / phrase.length;
 				for (var j = 0; j < phrase.length; j++)
 				{
-					var letter = _game.letters[j] = new LetterBox(_game.scene, phrase[j]);
-					var texture = _game.letterTextures[phrase[j]];
-					letter.init(texture, phrase[j]);
-					var pos = _game.raceTrack.GetBallPos((j + 1) * factor, 1.0, 0).position;
+					var k = Korokoro.getRandomInt(0, remaining.length);
+					var l = remaining[k];
+					remaining = remaining.slice(0, k) + remaining.slice(k + 1)
+					_game.letters[j] = new LetterBox(_game.scene, l);
+					var letter = _game.letters[j];
+					var texture = _game.letterTextures[l];
+					var offset = Korokoro.getRandom(-0.75, 0.75);
+					letter.init(texture, l);
+					var pos = _game.raceTrack.GetBallPos((j + 0.5) * factor, 1.0, offset).position;
 					letter.mesh.position.x = pos.x;
 					letter.mesh.position.y = pos.y;
 					letter.mesh.position.z = pos.z;
 
-					var shadowPos = _game.raceTrack.GetBallPos((j + 1) * factor, 0, 0);
+					var shadowPos = _game.raceTrack.GetBallPos((j + 0.5) * factor, 0, offset);
 					letter.shadow.position.x = shadowPos.position.x;
 					letter.shadow.position.y = shadowPos.position.y + 0.05;
 					letter.shadow.position.z = shadowPos.position.z;
@@ -180,6 +211,7 @@ Korokoro.prototype.startGame = function()
 	if (!this.run)
 	{
 		this.run = true;
+		this.updateStatusText("");
 		this.scene.remove(this.titleText.mesh);
 	}
 }
@@ -239,19 +271,53 @@ Korokoro.prototype.isButtonPressed = function(button)
 	return pressed;
 }
 
+Korokoro.prototype.updateStatusText = function(statusBefore)
+{
+	var status = this.marble1.getStatusText() + this.marble2.getStatusText();
+	if (0 != statusBefore.localeCompare(status))
+	{
+		document.getElementById("status").innerHTML = status;
+	}
+}
+
 Korokoro.prototype.processState = function(m1, m2)
 {
 	if (m1.mesh && m2.mesh)
 	{
+		var statusBefore = m1.getStatusText() + m2.getStatusText();
 		var letter1 = m1.hitTest(this.letters);
 		if (letter1)
 		{
-			letter1.mesh.position.y += 0.1;
+			if (!letter1.removed && this.marble1.checkLetter(letter1.letter))
+			{
+				m1.point += 100;
+				letter1.removeFromScene(this.marble1.mesh.material.map);
+			}
+			else if (!letter1.isSpinning())
+			{
+				m1.point += 10;
+				letter1.startSpin();
+			}
 		}
 		var letter2 = m2.hitTest(this.letters);
 		if (letter2)
 		{
-			letter2.mesh.position.y += 0.1;
+			if (!letter2.removed && this.marble2.checkLetter(letter2.letter))
+			{
+				m2.point += 100;
+				letter2.removeFromScene(this.marble2.mesh.material.map);
+			}
+			else if (!letter2.isSpinning())
+			{
+				m2.point += 10;
+				letter2.startSpin();
+			}
+		}
+		this.updateStatusText(statusBefore);
+
+		for (var i = 0; i < this.letters.length; i++)
+		{
+			this.letters[i].tick();
 		}
 		if (m1.outOfControl <= 0 && m2.outOfControl <=0)
 		{
@@ -360,6 +426,13 @@ Korokoro.prototype.removeGamepad = function(gamepad)
 
 Korokoro.prototype.updateStatus = function()
 {
+	var now = Date.now();
+	if (this.then != null && now - this.then < 10)
+	{
+		return;
+	}
+	this.then = now;
+
 	this.scanGamepads();
 
 	this.processState(this.marble1, this.marble2);
@@ -368,7 +441,7 @@ Korokoro.prototype.updateStatus = function()
 
 	if (this.run)
 	{
-		this.time += 0.05;
+		this.time += 0.04;
 		var camPosition = this.raceTrack.GetCameraPos(this.time).position;
 		var camFocus = this.raceTrack.GetFocusPos(this.time).position;
 		var ballPos1 = this.raceTrack.GetBallPos(this.time, 0.16, this.marble1.offset);

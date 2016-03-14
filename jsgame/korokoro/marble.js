@@ -14,8 +14,9 @@ Marble.OutOfControlTime =
 	jump: 40
 }
 
-function Marble(scene, textureName)
+function Marble(scene, identity, textureName)
 {
+	this.identity = identity;
 	this.scene = scene;
 	this.textureName = textureName;
 	this.mesh = null;
@@ -24,6 +25,15 @@ function Marble(scene, textureName)
 	this.jumpOffset = 0;
 	this.status = 0;
 	this.outOfControl = 0;
+	this.phrase;
+	this.phrasePos;
+	this.point = 0;
+}
+
+Marble.prototype.setPhrase = function(phrase)
+{
+	this.phrase = phrase;
+	this.phrasePos = 0;
 }
 
 Marble.prototype.hitTest = function(letters)
@@ -40,6 +50,30 @@ Marble.prototype.hitTest = function(letters)
 			return other;
 	}
 	return null;
+}
+
+Marble.prototype.checkLetter = function(letter)
+{
+	if (this.phrase[this.phrasePos] == letter)
+	{
+		this.phrasePos++;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+Marble.prototype.getStatusText = function()
+{
+	var status = this.identity + ": " + this.phrase.substring(0, this.phrasePos);
+	for (var i = 0; i < this.phrase.length - this.phrasePos; i++)
+	{
+		status += " _";
+	}
+	status = status + ", " + this.point + " point<br>";
+	return status;
 }
 
 Marble.prototype.isJump = function(status)

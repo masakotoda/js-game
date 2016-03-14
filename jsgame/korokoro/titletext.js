@@ -14,7 +14,7 @@ TitleText.prototype.init = function(font)
 	var bevelEnabled = true;
 	var curveSegments = 4;
 
-	var textGeo = new THREE.TextGeometry("welcome to koro koro!",
+	var textGeo = new THREE.TextGeometry("korokoro word hunt",
 		{
 			font: font,
 			size: size,

@@ -5,6 +5,8 @@ function LetterBox(scene, letter)
 	this.letter = letter;
 	this.mesh;
 	this.shadow;
+	this.spinTimer = 0;
+	this.removed = false;
 }
 
 LetterBox.prototype.init = function(texture)
@@ -48,4 +50,31 @@ LetterBox.prototype.createShadow = function()
 	geometry.faces.push(new THREE.Face3(segment, segment - 1, 0));
 
 	this.shadow = new THREE.Mesh(geometry, material);
+}
+
+LetterBox.prototype.startSpin = function()
+{
+	this.spinTimer = 20;
+	this.mesh.rotation.y = 0;
+}
+
+LetterBox.prototype.isSpinning = function()
+{
+	return this.spinTimer > 0;
+}
+
+LetterBox.prototype.tick = function()
+{
+	if (this.spinTimer > 0)
+	{
+		this.spinTimer--;
+		this.mesh.rotation.y += Math.PI / 5;
+	}
+}
+
+LetterBox.prototype.removeFromScene = function(texture)
+{
+	this.removed = true;
+	this.mesh.material.map = texture;
+	this.mesh.material.needsUpdate = true;
 }
