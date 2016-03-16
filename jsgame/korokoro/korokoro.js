@@ -170,6 +170,9 @@ Korokoro.prototype.onLoadFunc = function()
 
 Korokoro.prototype.onKeyDownFunc = function(e)
 {
+	if (!this.run)
+		return;
+
 	var key = e.keyCode ? e.keyCode : e.which;
 	if (key == 99 && this.marble1.outOfControl <= 0) // 10key - 3
 		this.marble1.status = Marble.Status.MovingRight;
