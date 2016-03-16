@@ -37,6 +37,12 @@ body
 	width: 1024px;
 }
 
+#inputForm
+{
+	margin: 0 auto;
+	width: 960px;
+}
+
 #note
 {
 	margin: 0 auto;
@@ -67,13 +73,29 @@ body
 
 <body>
 <div id="outer">
-	<div id="container">
-	</div>
+	<form id="inputForm">
+		<table>
+		<tr>
+		<td>
+		Player 1 (Pink marble), Enter a secret word that your opponent (Green marble) has to hunt:
+		<input type="password" id="word1"></input><br>
+		Player 2 (Green marble), Enter a secret word that your opponent (Pink marble) has to hunt:
+		<input type="password" id="word2"></input>
+		</td>
+		<td>
+		<input type="button" id="startButton" value="Start!" style="width:200px;height:40px"></input>
+		</td>
+		</tr>
+		</table>
+	</form>
 	<div id="status">
 	</div>
+	<div id="container">
+	</div>
 	<div id="note">
-		When you reload this page, gamepads may not be detected.
-		Switch to another chrome tab and come back. Gamepads probably will start working again.
+		<a href="index.html">Start over</a>
+		<!-- When you reload this page, gamepads may not be detected.
+		Switch to another chrome tab and come back. Gamepads probably will start working again. -->
 	</div>
 </div>
 </body>

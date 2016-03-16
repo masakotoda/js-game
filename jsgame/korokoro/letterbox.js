@@ -79,6 +79,15 @@ LetterBox.prototype.removeFromScene = function(texture)
 	this.mesh.material.needsUpdate = true;
 }
 
+LetterBox.prototype.destroy = function()
+{
+	this.scene.remove(this.mesh);
+	this.scene.remove(this.shadow);
+	delete this.mesh;
+	delete this.shadow;
+	delete this;
+}
+
 LetterBox.prototype.setPos = function(pos, shadowPos)
 {
 	this.mesh.position.x = pos.x;

@@ -27,7 +27,6 @@ function Marble(scene, identity, textureName)
 	this.outOfControl = 0;
 	this.phrase;
 	this.phrasePos;
-	this.point = 0;
 }
 
 Marble.prototype.setPhrase = function(phrase)
@@ -65,6 +64,11 @@ Marble.prototype.checkLetter = function(letter)
 	}
 }
 
+Marble.prototype.completed = function()
+{
+	return (this.phrase.length == this.phrasePos);
+}
+
 Marble.prototype.getStatusText = function()
 {
 	var status = this.identity + ": " + this.phrase.substring(0, this.phrasePos);
@@ -72,7 +76,7 @@ Marble.prototype.getStatusText = function()
 	{
 		status += " _";
 	}
-	status = status + ", " + this.point + " point<br>";
+	status = status + "<br>";
 	return status;
 }
 

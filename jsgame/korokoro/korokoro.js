@@ -86,32 +86,16 @@ Korokoro.onLetterTextureLoaded = function(texture)
 	var ready = Korokoro.size(_game.letterTextures) == Korokoro.Const.alphabet;
 	if (ready)
 	{
-		var phrase = _game.marble1.phrase + _game.marble2.phrase;
-		var remaining = phrase;
-		var factor = _game.raceTrack.getLength() / phrase.length;
-		for (var j = 0; j < phrase.length; j++)
-		{
-			var k = Korokoro.getRandomInt(0, remaining.length);
-			var l = remaining[k];
-			remaining = remaining.slice(0, k) + remaining.slice(k + 1)
-
-			var letter = new LetterBox(_game.scene, l);
-			var texture = _game.letterTextures[l];
-			letter.init(texture, l);
-
-			var offset = Korokoro.getRandom(-0.75, 0.75);
-			var pos = _game.raceTrack.GetBallPos((j + 0.5) * factor, 1.0, offset).position;
-			var shadowPos = _game.raceTrack.GetBallPos((j + 0.5) * factor, 0, offset);
-			letter.setPos(pos, shadowPos);
-
-			_game.letters[j] = letter;
-		}
+		_game.createLetters();
 	}
 }
 
 // Member functions
 Korokoro.prototype.onLoadFunc = function() 
 {
+	document.getElementById('startButton').addEventListener
+		('click', function() { _game.startGame(); });
+
 	// Grab our container div 
 	var container = document.getElementById("container"); 
 
@@ -300,12 +284,10 @@ Korokoro.prototype.processState = function(m1, m2)
 		{
 			if (!letter1.removed && this.marble1.checkLetter(letter1.letter))
 			{
-				m1.point += 100;
 				letter1.removeFromScene(this.marble1.mesh.material.map);
 			}
 			else if (!letter1.isSpinning())
 			{
-				m1.point += 10;
 				letter1.startSpin();
 			}
 		}
@@ -449,6 +431,11 @@ Korokoro.prototype.updateStatus = function()
 	this.updatePlayer(this.gamepad1, this.marble1);
 	this.updatePlayer(this.gamepad2, this.marble2);
 
+	if (this.marble1.completed() || this.marble2.completed())
+	{
+		this.run = false;
+	}
+
 	if (this.run)
 	{
 		this.time += 0.04;
@@ -514,11 +501,51 @@ Korokoro.prototype.updateStatus = function()
 	this.renderer.render(this.scene, this.camera);
 }
 
+Korokoro.prototype.createLetters = function()
+{
+	for (var i = 0; i < this.letters.length; i++)
+	{
+		this.letters[i].destroy();
+	}
+	this.letters = [];
+
+	var phrase = this.marble1.phrase + this.marble2.phrase;
+	var remaining = phrase;
+	var factor = this.raceTrack.getLength() / phrase.length;
+	for (var j = 0; j < phrase.length; j++)
+	{
+		var k = Korokoro.getRandomInt(0, remaining.length);
+		var l = remaining[k];
+		remaining = remaining.slice(0, k) + remaining.slice(k + 1)
+
+		var letter = new LetterBox(this.scene, l);
+		var texture = this.letterTextures[l];
+		letter.init(texture, l);
+
+		var offset = Korokoro.getRandom(-0.75, 0.75);
+		var pos = this.raceTrack.GetBallPos((j + 0.5) * factor, 1.0, offset).position;
+		var shadowPos = this.raceTrack.GetBallPos((j + 0.5) * factor, 0, offset);
+		letter.setPos(pos, shadowPos);
+
+		this.letters[j] = letter;
+	}
+}
+
 Korokoro.prototype.startGame = function()
 {
 	if (!this.run)
 	{
+		var word1 = document.getElementById('word1').value;
+		var word2 = document.getElementById('word2').value;
+		//TODO sanitize word1 & word2
+		if (word1.length == 0 || word2.length == 0)
+			return;
+
+		document.getElementById('inputForm').style.display = 'none';
 		this.run = true;
+		this.marble1.setPhrase(word2.toLowerCase());
+		this.marble2.setPhrase(word1.toLowerCase());
+		this.createLetters();
 		this.updateStatusText("");
 		this.scene.remove(this.titleText.mesh);
 	}
