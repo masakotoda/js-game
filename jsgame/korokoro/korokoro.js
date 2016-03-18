@@ -42,7 +42,7 @@ Korokoro.Button =
 
 Korokoro.Const =
 {
-	msecPerFrame: 10,
+	msecPerFrame: 12,
 	imagePath: 'images/',
 	alphabet: 26
 }
@@ -268,12 +268,18 @@ Korokoro.prototype.isButtonPressed = function(button)
 	return pressed;
 }
 
+Korokoro.prototype.getStatusText = function()
+{
+	return this.marble1.getStatusText() + this.marble2.getStatusText();
+}
+
 Korokoro.prototype.updateStatusText = function(statusBefore)
 {
-	var status = this.marble1.getStatusText() + this.marble2.getStatusText();
+	var status = this.getStatusText();
 	if (0 != statusBefore.localeCompare(status))
 	{
-		document.getElementById("status").innerHTML = status;
+		document.getElementById("marble1_status").innerHTML = this.marble1.getStatusText();
+		document.getElementById("marble2_status").innerHTML = this.marble2.getStatusText();
 	}
 }
 
@@ -281,7 +287,7 @@ Korokoro.prototype.processState = function(m1, m2)
 {
 	if (m1.mesh && m2.mesh)
 	{
-		var statusBefore = m1.getStatusText() + m2.getStatusText();
+		var statusBefore = this.getStatusText();
 		var letter1 = m1.hitTest(this.letters);
 		if (letter1)
 		{

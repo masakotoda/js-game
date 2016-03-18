@@ -35,18 +35,28 @@ body
 {
 	margin: 0 auto;
 	width: 1024px;
+	background-color: #cccccc;
+	font-family: 'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif;
+	font-size: 24px;
+	font-weight: 500;
+	color: #0000ff;
 }
 
 #inputForm
 {
 	margin: 0 auto;
-	width: 960px;
+	width: 1024px;
+	background-color: #cccccc;
+	font-family: 'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif;
+	font-size: 14px;
 }
 
 #note
 {
 	margin: 0 auto;
 	width: 1024px;
+	font-family: 'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif;
+	font-size: 14px;
 }
 </style>
 
@@ -74,21 +84,29 @@ body
 <body>
 <div id="outer">
 	<form id="inputForm">
-		<table>
+		<table width="100%">
 		<tr>
-		<td>
-		Player 1 (Pink marble), Enter a secret word that your opponent (Green marble) has to hunt:
-		<input type="password" id="word1"></input><br>
-		Player 2 (Green marble), Enter a secret word that your opponent (Pink marble) has to hunt:
-		<input type="password" id="word2"></input>
-		</td>
-		<td>
-		<input type="button" id="startButton" value="Start!" style="width:200px;height:40px"></input>
-		</td>
+		<td>Player 1 (Pink marble)</td>
+		<td>Enter a secret word that your opponent (Green marble) has to hunt:</td>
+		<td><input type="password" id="word1" value="monkey"></input></td>
+		<td align="right" rowspan="2"><input type="button" id="startButton" value="Start!" style="width:100px;height:40px"></input></td>
+		</tr>
+		<tr>
+		<td>Player 2 (Green marble)</td>
+		<td>Enter a secret word that your opponent (Pink marble) has to hunt:</td>
+		<td><input type="password" id="word2" value="banana"></input></td>
 		</tr>
 		</table>
 	</form>
 	<div id="status">
+		<table width="100%">
+		<tr>
+		<td id="marble1_status">
+		</td>
+		<td id="marble2_status" align="right">
+		</td>
+		</tr>
+		</table>
 	</div>
 	<div id="container">
 	</div>

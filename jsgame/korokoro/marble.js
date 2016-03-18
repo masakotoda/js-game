@@ -76,7 +76,6 @@ Marble.prototype.getStatusText = function()
 	{
 		status += " _";
 	}
-	status = status + "<br>";
 	return status;
 }
 
