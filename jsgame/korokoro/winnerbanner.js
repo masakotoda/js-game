@@ -2,11 +2,16 @@
 function WinnerBanner(scene)
 {
 	this.scene = scene;
-	this.mesh;
+	this.mesh = null;
+	this.timer = 40;
+	this.winner = null;
 }
 
 WinnerBanner.prototype.init = function(font, winner)
 {
+	this.winner = winner;
+	this.winner.mesh.position.set(0, 1, 0);
+
 	var size = 0.15;
 	var height = 0.1;
 	var bevelThickness = 0.01;
@@ -14,7 +19,7 @@ WinnerBanner.prototype.init = function(font, winner)
 	var bevelEnabled = true;
 	var curveSegments = 4;
 
-	var textGeo = new THREE.TextGeometry("Winner: " + winner + "!",
+	var textGeo = new THREE.TextGeometry("Winner: " + winner.identity + "!",
 		{
 			font: font,
 			size: size,
@@ -35,12 +40,26 @@ WinnerBanner.prototype.init = function(font, winner)
 	var material = new THREE.MeshPhongMaterial({ color: 0xff0000 });
 	this.mesh = new THREE.Mesh(textGeo, material);
 
-	this.mesh.position.x = -0.80;
-	this.mesh.position.y = 2;
-	this.mesh.position.z = 0;
-
-	this.mesh.rotation.x = 0;
-	this.mesh.rotation.y = 0;
+	this.mesh.position.set(-0.80, 2, 0);
+	this.mesh.rotation.set(0, 0, 0);
 
 	this.scene.add(this.mesh);
+}
+
+WinnerBanner.prototype.tick = function()
+{
+	if (this.timer > 0)
+	{
+		this.timer--;
+	}
+	else
+	{
+		this.mesh.rotation.x -= 0.01;
+		this.winner.mesh.rotation.y += 0.02;
+	}
+}
+
+WinnerBanner.prototype.isReady = function()
+{
+	return (this.timer == 0 && this.winner == null);
 }

@@ -2,8 +2,6 @@
 // Constructor
 function Korokoro()
 {
-	this.initialCamPos = { x: 0, y: 1.3333, z: 3.3333 };
-	this.initialLookAt = { x: 0, y: 0, x: -20 };
 	this.scene;
 	this.sceneTwin;
 	this.renderer;
@@ -21,14 +19,12 @@ function Korokoro()
 	this.letterTextures = [];
 
 	this.raceTrack;
-	this.run = false;
+	this.gameState = Korokoro.GameState.ready;
 	this.time = 0;
 
 	this.then;
 	this.font;
-	this.winner;
 	this.winnerBanner;
-	this.winnerBannerTimer;
 }
 
 // Enums / constants
@@ -43,65 +39,26 @@ Korokoro.Button =
 	Up: 12,
 	Down: 13,
 	Left: 14,
-	Right: 15
+	Right: 15,
+}
+
+Korokoro.GameState =
+{
+	ready: 0,
+	playing: 1,
+	gameOver: 2
 }
 
 Korokoro.Const =
 {
 	msecPerFrame: 12,
 	imagePath: 'images/',
-	alphabet: 26
+	alphabet: 26,
+	initialCamPos: { x: 0, y: 1.3333, z: 3.3333 },
+	initialLookAt: { x: 0, y: 0, x: -20 }
 }
 
 // Static functions, callback functions
-Korokoro.getRandom = function(min, max)
-{
-  return Math.random() * (max - min) + min;
-}
-
-Korokoro.getRandomInt = function(min, max)
-{
-  return Math.floor(Math.random() * (max - min)) + min;
-}
-
-Korokoro.getRandomIntInclusive = function(min, max)
-{
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-Korokoro.size = function(obj)
-{
-	var size = 0, key;
-	for (key in obj)
-	{
-		if (obj.hasOwnProperty(key))
-			size++;
-	}
-	return size;
-}
-
-Korokoro.isAlphaOnly = function(text)
-{
-	var alpha = /^[a-zA-Z_]+$/;
-	return text.match(alpha);
-}
-
-Korokoro.getParameter = function(name)
-{
-	url = window.location.href;
-	url = url.toLowerCase(); // This is just to avoid case sensitiveness
-	name = name.replace(/[\[\]]/g, "\\$&").toLowerCase();// This is just to avoid case sensitiveness for query parameter name
-	var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
-	var results = regex.exec(url);
-
-	if (!results)
-		return null;
-	if (!results[2])
-		return '';
-
-	return decodeURIComponent(results[2].replace(/\+/g, " "));
-}
-
 Korokoro.onLetterTextureLoaded = function(texture)
 {
 	var n = texture.image.currentSrc.indexOf(Korokoro.Const.imagePath);
@@ -111,7 +68,7 @@ Korokoro.onLetterTextureLoaded = function(texture)
 	var chr = texture.image.currentSrc[n + Korokoro.Const.imagePath.length];
 	_game.letterTextures[chr] = texture;
 
-	var ready = Korokoro.size(_game.letterTextures) == Korokoro.Const.alphabet + 1;
+	var ready = SakiUtil.size(_game.letterTextures) == Korokoro.Const.alphabet + 1;
 	if (ready)
 	{
 		_game.createLetters();
@@ -131,7 +88,7 @@ Korokoro.prototype.onLoadFunc = function()
 			window.location.href = orig;
 		});
 
-	var url = Korokoro.getParameter("theme");
+	var url = SakiUtil.getParameter("theme");
 	if (url && url.length > 0)
 	{
 		var xmlhttp = new XMLHttpRequest();
@@ -140,8 +97,8 @@ Korokoro.prototype.onLoadFunc = function()
 			if (xmlhttp.readyState == 4 && xmlhttp.status == 200)
 			{
 				var j = JSON.parse(xmlhttp.responseText);
-				var i1 = Korokoro.getRandomInt(0, j.length);
-				var i2 = Korokoro.getRandomInt(0, j.length);
+				var i1 = SakiUtil.getRandomInt(0, j.length);
+				var i2 = SakiUtil.getRandomInt(0, j.length);
 				document.getElementById('word1').value = j[i1];
 				document.getElementById('word2').value = j[i2];
 			}
@@ -167,8 +124,8 @@ Korokoro.prototype.onLoadFunc = function()
 	// Put in a camera 
 	this.camera = new THREE.PerspectiveCamera
 		(45, container.offsetWidth / container.offsetHeight, 1, 4000);
-	this.camera.position.set(this.initialCamPos.x, this.initialCamPos.y, this.initialCamPos.z);
-	this.camera.lookAt(this.initialLookAt);
+	this.camera.position.set(Korokoro.Const.initialCamPos.x, Korokoro.Const.initialCamPos.y, Korokoro.Const.initialCamPos.z);
+	this.camera.lookAt(Korokoro.Const.initialLookAt);
 
 	// Create a directional light to show off the object 
 	this.light = new THREE.DirectionalLight(0xffffff, 1.5);
@@ -230,7 +187,7 @@ Korokoro.prototype.onLoadFunc = function()
 
 Korokoro.prototype.onKeyDownFunc = function(e)
 {
-	if (!this.run)
+	if (this.gameState != Korokoro.GameState.playing)
 		return;
 
 	var key = e.keyCode ? e.keyCode : e.which;
@@ -499,46 +456,48 @@ Korokoro.prototype.updateStatus = function()
 	this.processState(this.marble1, this.marble2);
 	this.updatePlayer(this.gamepad1, this.marble1);
 	this.updatePlayer(this.gamepad2, this.marble2);
+	this.titleText.tick();
 
 	if (this.marble1.completed() || this.marble2.completed())
 	{
-		if (this.run)
+		this.gameState = Korokoro.GameState.gameOver;
+
+		if (!this.winnerBanner)
 		{
-			this.winnerBannerTimer = 40;
-			this.run = false;
+			this.winnerBanner = new WinnerBanner(this.scene);
 		}
-		else
-		{
-			this.winnerBannerTimer--;
-		}
-		if (this.winnerBannerTimer == 0)
+
+		this.winnerBanner.tick();
+		if (this.winnerBanner.isReady())
 		{
 			for (var i = 0; i < this.letters.length; i++)
 			{
 				this.letters[i].destroy();
 			}
 			this.letters = [];
+
+			var winner = null;
 			if (this.marble1.completed())
 			{
-				this.winner = this.marble1;
+				winner = this.marble1;
 				this.marble2.destroy();
 			}
 			else
 			{
-				this.winner = this.marble2;
+				winner = this.marble2;
 				this.marble1.destroy();
 			}
 
 			this.raceTrack.destroy();
 
-			this.camera.position.set(this.initialCamPos.x, this.initialCamPos.y, this.initialCamPos.z);
-			this.camera.lookAt(this.initialLookAt);
-			this.winnerBanner = new WinnerBanner(this.scene);
-			this.winnerBanner.init(this.font, this.winner.identity);
+			this.camera.position.set(Korokoro.Const.initialCamPos.x, Korokoro.Const.initialCamPos.y, Korokoro.Const.initialCamPos.z);
+			this.camera.lookAt(Korokoro.Const.initialLookAt);
+			this.light.position.set(0, 1, 0.75);
+			this.winnerBanner.init(this.font, winner);
 		}
 	}
 
-	if (this.run)
+	if (this.gameState == Korokoro.GameState.playing)
 	{
 		this.time += 0.04;
 		var camPosition = this.raceTrack.GetCameraPos(this.time).position;
@@ -547,7 +506,7 @@ Korokoro.prototype.updateStatus = function()
 		var ballPos2 = this.raceTrack.GetBallPos(this.time, 0.16, this.marble2.offset);
 		if (camFocus == null || camPosition == null)
 		{
-			this.run = false;
+			this.gameState = Korokoro.GameState.gameOver;
 			this.time = 0;
 		}
 		else
@@ -589,17 +548,6 @@ Korokoro.prototype.updateStatus = function()
 	}
 	else
 	{
-		if (this.titleText.mesh)
-		{
-			this.titleText.mesh.rotation.x -= 0.01;
-		}
-		if (this.winnerBanner)
-		{
-			this.winnerBanner.mesh.rotation.x -= 0.01;
-			this.winner.mesh.position.set(0, 1, 0);
-			this.winner.mesh.rotation.y -= 0.05;
-			this.light.position.set(0, 1, 0.75);
-		}
 		//this.camera.position.set(this.cameraPos.x, this.cameraPos.y, this.cameraPos.z);
 		//this.camera.lookAt(this.marble1.mesh.position)
 	}
@@ -623,7 +571,7 @@ Korokoro.prototype.createLetters = function()
 	var factor = this.raceTrack.getLength() / phrase.length;
 	for (var j = 0; j < phrase.length; j++)
 	{
-		var k = Korokoro.getRandomInt(0, remaining.length);
+		var k = SakiUtil.getRandomInt(0, remaining.length);
 		var l = remaining[k];
 		remaining = remaining.slice(0, k) + remaining.slice(k + 1)
 
@@ -631,7 +579,7 @@ Korokoro.prototype.createLetters = function()
 		var texture = this.letterTextures[l];
 		letter.init(texture, l);
 
-		var offset = Korokoro.getRandom(-0.75, 0.75);
+		var offset = SakiUtil.getRandom(-0.75, 0.75);
 		var pos = this.raceTrack.GetBallPos((j + 0.5) * factor, 1.0, offset).position;
 		var shadowPos = this.raceTrack.GetBallPos((j + 0.5) * factor, 0, offset);
 		letter.setPos(pos, shadowPos);
@@ -642,12 +590,12 @@ Korokoro.prototype.createLetters = function()
 
 Korokoro.prototype.startGame = function()
 {
-	if (!this.run && !this.winner)
+	if (this.gameState == Korokoro.GameState.ready)
 	{
 		var word1 = document.getElementById('word1').value;
 		var word2 = document.getElementById('word2').value;
 
-		if (!Korokoro.isAlphaOnly(word1) || !Korokoro.isAlphaOnly(word2)
+		if (!SakiUtil.isAlphaOnly(word1) || !SakiUtil.isAlphaOnly(word2)
 			|| word1.length == 0 || word2.length == 0)
 		{
 			alert('Please enter a word. (No numbers and symbols.)');
@@ -655,11 +603,11 @@ Korokoro.prototype.startGame = function()
 		}
 
 		document.getElementById('inputForm').style.display = 'none';
-		this.run = true;
+		this.gameState = Korokoro.GameState.playing;
 		this.marble1.setPhrase(word2.toLowerCase());
 		this.marble2.setPhrase(word1.toLowerCase());
 		this.createLetters();
 		this.updateStatusText("");
-		this.scene.remove(this.titleText.mesh);
+		this.titleText.destroy();
 	}
 }

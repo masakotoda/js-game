@@ -2,7 +2,7 @@
 function TitleText(scene)
 {
 	this.scene = scene;
-	this.mesh;
+	this.mesh = null;
 }
 
 TitleText.prototype.init = function(font)
@@ -35,12 +35,22 @@ TitleText.prototype.init = function(font)
 	var material = new THREE.MeshPhongMaterial({ color: 0x0000ff });
 	this.mesh = new THREE.Mesh(textGeo, material);
 
-	this.mesh.position.x = -1;
-	this.mesh.position.y = 2;
-	this.mesh.position.z = 0;
-
-	this.mesh.rotation.x = 0;
-	this.mesh.rotation.y = 0;
+	this.mesh.position.set(-1, 2, 0);
+	this.mesh.rotation.set(0, 0, 0);
 
 	this.scene.add(this.mesh);
+}
+
+TitleText.prototype.tick = function()
+{
+	if (this.mesh)
+	{
+		this.mesh.rotation.x -= 0.01;
+	}
+}
+
+TitleText.prototype.destroy = function()
+{
+	this.scene.remove(this.mesh);
+	delete this.mesh;
 }
