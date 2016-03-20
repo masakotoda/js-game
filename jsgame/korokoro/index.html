@@ -37,7 +37,7 @@ body
 	width: 1024px;
 	background-color: #cccccc;
 	font-family: 'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif;
-	font-size: 24px;
+	font-size: 20px;
 	font-weight: 500;
 	color: #0000ff;
 }
@@ -67,7 +67,6 @@ body
 <script src="titletext.js"></script>
 <script src="letterbox.js"></script>
 <script src="winnerbanner.js"></script>
-<script src="randomcube.js"></script>
 <script src="globals.js"></script>
 
 <script type="text/javascript">
@@ -89,13 +88,13 @@ body
 		<tr>
 		<td>Player 1 (Pink marble)</td>
 		<td>Enter a secret word that your opponent (Green marble) has to hunt:</td>
-		<td><input type="password" id="word1" size="24" value="monkey"></input></td>
+		<td><input type="password" id="word1" maxlength="24"></input></td>
 		<td align="right" rowspan="2"><input type="button" id="startButton" value="Start!" style="width:100px;height:40px"></input></td>
 		</tr>
 		<tr>
 		<td>Player 2 (Green marble)</td>
 		<td>Enter a secret word that your opponent (Pink marble) has to hunt:</td>
-		<td><input type="password" id="word2" size="24" value="banana"></input></td>
+		<td><input type="password" id="word2" maxlength="24"></input></td>
 		</tr>
 		</table>
 	</form>
@@ -112,7 +111,16 @@ body
 	<div id="container">
 	</div>
 	<div id="note">
-		<a href="index.html">Start over</a>
+		<table width="100%">
+		<tr>
+		<td align="left">
+		<a href="welcome.html">Go to welcome page</a>
+		</td>
+		<td align="right">
+		<button id="playAgainButton">Play Again</button>
+		</td>
+		</tr>
+		</table>
 		<!-- When you reload this page, gamepads may not be detected.
 		Switch to another chrome tab and come back. Gamepads probably will start working again. -->
 	</div>

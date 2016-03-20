@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>
+welcome to korokoro
+</title>
+
+<style>
+body
+{
+	margin: 0 !important;
+	padding: 10px !important;
+}
+
+#outer
+{
+	margin: 0 !important;
+	height: 100%;
+	width: 100%;
+	background-color: white;
+}
+
+#inner
+{
+	margin: 0 auto;
+	padding: 10px !important;
+	width: 800px;
+	background-color: #eeeeff;
+	font-family: 'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif;
+	font-size: 14px;
+	font-weight: 500;
+	color: #333355;
+}
+
+td
+{
+	border: 1px solid #333355;
+	padding: 3px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="outer">
+	<div id="inner">
+	<h2>Welcome to korokoro word hunt!</h2>
+
+	<h3>
+	<a href="index.html">Play Now</a>,
+	<a href="index.html?theme=preset.txt">Play Fastfood theme</a>,
+	<a href="index.html?theme=preset2.txt">Play C++ algorithm theme</a>
+	</h3>
+
+	<h3>Objective</h3>
+	'korokoro word hunt' is a 2-player game.
+	Each player gives a secret word to his/her opponent, 
+	and each player hunts the given word.
+
+	<h3>How to play</h3>
+	The play screen looks like this:<br>
+	<img src="images/playscreen.png">
+	<p>
+	You (and your opponent) need to move the marbles to left or right, or jump to hit the letters.
+	</p>
+	<table>
+	<tr><td></td><td>Gamepads (Logitech F710, F310)	</td><td>Keyboard - Player 1</td><td>Player 2</td></tr>
+	<tr><td>Move to left:	</td><td>[Left] button	</td><td> 10 key [1]</td><td>[A]</td></tr>
+	<tr><td>Move to right:	</td><td>[Right] button	</td><td> 10 key [3]</td><td>[D]</td></tr>
+	<tr><td>Jump:			</td><td>[Y] button		</td><td> 10 key [5]</td><td>[W]</td></tr>
+	<tr><td>Jump to left:	</td><td>[X] button		</td><td> 10 key [4]</td><td>[Q]</td></tr>
+	<tr><td>Jump to right:	</td><td>[B] button		</td><td> 10 key [6]</td><td>[E]</td></tr>
+	</table>
+	<p>
+	Click <a href="index.html">here</a> to play.
+	To play with (psuedo) randomly picked words,
+	click <a href="index.html?theme=preset.txt">here</a> (theme: fastfood), or
+	click <a href="index.html?theme=preset2.txt">here</a> (theme: C++ algorithm).
+	</p>
+
+	<h3>Something to know</h3>
+	<ul>
+	<li>The marbles travel forward automatically 
+	(You have no control, so that you and your opponent will always be side-by-side. 
+	It also means you can bump your opponent to sabotage him/her if you wish...)</li>
+	<li>Auto picked words may not be fair... i.e. one might get a word with 5 letters, 
+	and another might get a word with 10 letters.</li>
+	<li>The length of words may be served as 'handycap'...</li>
+	</ul>
+	</div>
+</div>
+</body>
+
+</html>

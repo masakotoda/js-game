@@ -86,6 +86,22 @@ Korokoro.isAlphaOnly = function(text)
 	return text.match(alpha);
 }
 
+Korokoro.getParameter = function(name)
+{
+	url = window.location.href;
+	url = url.toLowerCase(); // This is just to avoid case sensitiveness
+	name = name.replace(/[\[\]]/g, "\\$&").toLowerCase();// This is just to avoid case sensitiveness for query parameter name
+	var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
+	var results = regex.exec(url);
+
+	if (!results)
+		return null;
+	if (!results[2])
+		return '';
+
+	return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+
 Korokoro.onLetterTextureLoaded = function(texture)
 {
 	var n = texture.image.currentSrc.indexOf(Korokoro.Const.imagePath);
@@ -108,24 +124,32 @@ Korokoro.prototype.onLoadFunc = function()
 	document.getElementById('startButton').addEventListener
 		('click', function() { _game.startGame(); });
 
-
-	var xmlhttp = new XMLHttpRequest();
-	var url = "preset2.txt";
-
-	xmlhttp.onreadystatechange = function()
-	{
-		if (xmlhttp.readyState == 4 && xmlhttp.status == 200)
+	document.getElementById('playAgainButton').addEventListener
+		('click', function()
 		{
-			var j = JSON.parse(xmlhttp.responseText);
-			var i1 = Korokoro.getRandomInt(0, j.length);
-			var i2 = Korokoro.getRandomInt(0, j.length);
-			document.getElementById('word1').value = j[i1];
-			document.getElementById('word2').value = j[i2];
-		}
-	};
+			var orig = window.location.href;
+			window.location.href = orig;
+		});
 
-	xmlhttp.open("GET", url, true);
-	xmlhttp.send();
+	var url = Korokoro.getParameter("theme");
+	if (url && url.length > 0)
+	{
+		var xmlhttp = new XMLHttpRequest();
+		xmlhttp.onreadystatechange = function()
+		{
+			if (xmlhttp.readyState == 4 && xmlhttp.status == 200)
+			{
+				var j = JSON.parse(xmlhttp.responseText);
+				var i1 = Korokoro.getRandomInt(0, j.length);
+				var i2 = Korokoro.getRandomInt(0, j.length);
+				document.getElementById('word1').value = j[i1];
+				document.getElementById('word2').value = j[i2];
+			}
+		};
+
+		xmlhttp.open("GET", url, true);
+		xmlhttp.send();
+	}
 
 	// Grab our container div 
 	var container = document.getElementById("container"); 
