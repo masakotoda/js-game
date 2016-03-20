@@ -3,6 +3,8 @@ function RaceTrack(scene)
 {
 	this.scene = scene;
 	this.object = null;
+	this.twin = null;
+	this.group = null;
 	this.raycaster = new THREE.Raycaster();
 	this.distances = [];
 }
@@ -208,13 +210,15 @@ RaceTrack.prototype.init = function()
 	//line.position.y = 0.2;
 	//group.add(line);
 
-	var twin = new THREE.Mesh(geom, new THREE.MeshBasicMaterial( { color: 0xcc0008 } ));
-	twin.position.y = -0.1;
-	group.add(twin);
+	this.twin = new THREE.Mesh(geom, new THREE.MeshBasicMaterial( { color: 0xcc0008 } ));
+	this.twin.position.y = -0.1;
+	group.add(this.twin);
 
 	this.object.castShadow = false;
 	this.object.receiveShadow = true;
 	group.add(this.object);
+
+	this.group = group;
 
 	// Some cool vertical line on faces
 	//var fnh = new THREE.FaceNormalsHelper(this.object, 1);
@@ -410,4 +414,9 @@ RaceTrack.prototype.getLength = function()
 		len += this.distances[i];
 	}
 	return len;
+}
+
+RaceTrack.prototype.destroy = function()
+{
+	this.scene.remove(this.group);
 }

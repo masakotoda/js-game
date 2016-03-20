@@ -25,7 +25,7 @@ function Marble(scene, identity, textureName)
 	this.jumpOffset = 0;
 	this.status = 0;
 	this.outOfControl = 0;
-	this.phrase;
+	this.phrase = "";
 	this.phrasePos;
 }
 
@@ -247,4 +247,10 @@ Marble.prototype.setInitialPos = function(x)
 	this.shadow.position.x = x;
 	this.shadow.position.y = 0.01;
 	this.offset = x;
+}
+
+Marble.prototype.destroy = function()
+{
+	this.scene.remove(this.mesh);
+	this.scene.remove(this.shadow);
 }

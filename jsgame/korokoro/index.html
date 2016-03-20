@@ -24,7 +24,7 @@ body
 
 #container
 {
-	cursor: none;
+	cursor: auto;
 	margin: 0 auto;
 	height: 640px;
 	width: 1024px;
@@ -66,6 +66,7 @@ body
 <script src="marble.js"></script>
 <script src="titletext.js"></script>
 <script src="letterbox.js"></script>
+<script src="winnerbanner.js"></script>
 <script src="randomcube.js"></script>
 <script src="globals.js"></script>
 
@@ -88,13 +89,13 @@ body
 		<tr>
 		<td>Player 1 (Pink marble)</td>
 		<td>Enter a secret word that your opponent (Green marble) has to hunt:</td>
-		<td><input type="password" id="word1" value="monkey"></input></td>
+		<td><input type="password" id="word1" size="24" value="monkey"></input></td>
 		<td align="right" rowspan="2"><input type="button" id="startButton" value="Start!" style="width:100px;height:40px"></input></td>
 		</tr>
 		<tr>
 		<td>Player 2 (Green marble)</td>
 		<td>Enter a secret word that your opponent (Pink marble) has to hunt:</td>
-		<td><input type="password" id="word2" value="banana"></input></td>
+		<td><input type="password" id="word2" size="24" value="banana"></input></td>
 		</tr>
 		</table>
 	</form>

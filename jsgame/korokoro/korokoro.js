@@ -2,12 +2,14 @@
 // Constructor
 function Korokoro()
 {
+	this.initialCamPos = { x: 0, y: 1.3333, z: 3.3333 };
+	this.initialLookAt = { x: 0, y: 0, x: -20 };
 	this.scene;
 	this.sceneTwin;
 	this.renderer;
 	this.light;
 	this.camera;
-	this.cameraPos = { x: 0, y: 1.3333, z: 3.3333 };
+	this.cameraPos;
 
 	this.gamepad1;
 	this.gamepad2;
@@ -23,6 +25,10 @@ function Korokoro()
 	this.time = 0;
 
 	this.then;
+	this.font;
+	this.winner;
+	this.winnerBanner;
+	this.winnerBannerTimer;
 }
 
 // Enums / constants
@@ -74,6 +80,12 @@ Korokoro.size = function(obj)
 	return size;
 }
 
+Korokoro.isAlphaOnly = function(text)
+{
+	var alpha = /^[a-zA-Z_]+$/;
+	return text.match(alpha);
+}
+
 Korokoro.onLetterTextureLoaded = function(texture)
 {
 	var n = texture.image.currentSrc.indexOf(Korokoro.Const.imagePath);
@@ -83,7 +95,7 @@ Korokoro.onLetterTextureLoaded = function(texture)
 	var chr = texture.image.currentSrc[n + Korokoro.Const.imagePath.length];
 	_game.letterTextures[chr] = texture;
 
-	var ready = Korokoro.size(_game.letterTextures) == Korokoro.Const.alphabet;
+	var ready = Korokoro.size(_game.letterTextures) == Korokoro.Const.alphabet + 1;
 	if (ready)
 	{
 		_game.createLetters();
@@ -95,6 +107,25 @@ Korokoro.prototype.onLoadFunc = function()
 {
 	document.getElementById('startButton').addEventListener
 		('click', function() { _game.startGame(); });
+
+
+	var xmlhttp = new XMLHttpRequest();
+	var url = "preset2.txt";
+
+	xmlhttp.onreadystatechange = function()
+	{
+		if (xmlhttp.readyState == 4 && xmlhttp.status == 200)
+		{
+			var j = JSON.parse(xmlhttp.responseText);
+			var i1 = Korokoro.getRandomInt(0, j.length);
+			var i2 = Korokoro.getRandomInt(0, j.length);
+			document.getElementById('word1').value = j[i1];
+			document.getElementById('word2').value = j[i2];
+		}
+	};
+
+	xmlhttp.open("GET", url, true);
+	xmlhttp.send();
 
 	// Grab our container div 
 	var container = document.getElementById("container"); 
@@ -112,7 +143,8 @@ Korokoro.prototype.onLoadFunc = function()
 	// Put in a camera 
 	this.camera = new THREE.PerspectiveCamera
 		(45, container.offsetWidth / container.offsetHeight, 1, 4000);
-	this.camera.position.set(this.cameraPos.x, this.cameraPos.y, this.cameraPos.z);
+	this.camera.position.set(this.initialCamPos.x, this.initialCamPos.y, this.initialCamPos.z);
+	this.camera.lookAt(this.initialLookAt);
 
 	// Create a directional light to show off the object 
 	this.light = new THREE.DirectionalLight(0xffffff, 1.5);
@@ -150,6 +182,7 @@ Korokoro.prototype.onLoadFunc = function()
 	this.titleText = new TitleText(this.scene);
 	var fontLoader = new THREE.FontLoader();
 	fontLoader.load('fonts/' + 'Trebuchet MS_Regular.js', function (font) {
+		_game.font = font;
 		_game.titleText.init(font);
 	});
 
@@ -161,6 +194,9 @@ Korokoro.prototype.onLoadFunc = function()
 			Korokoro.onLetterTextureLoaded(texture);
 		});
 	}
+	texLoader.load(Korokoro.Const.imagePath + '_.png', function(texture) {
+		Korokoro.onLetterTextureLoaded(texture);
+	});
 
 	//var cube = new RandomCube(this.scene);
 	//cube.Init();
@@ -442,7 +478,40 @@ Korokoro.prototype.updateStatus = function()
 
 	if (this.marble1.completed() || this.marble2.completed())
 	{
-		this.run = false;
+		if (this.run)
+		{
+			this.winnerBannerTimer = 40;
+			this.run = false;
+		}
+		else
+		{
+			this.winnerBannerTimer--;
+		}
+		if (this.winnerBannerTimer == 0)
+		{
+			for (var i = 0; i < this.letters.length; i++)
+			{
+				this.letters[i].destroy();
+			}
+			this.letters = [];
+			if (this.marble1.completed())
+			{
+				this.winner = this.marble1;
+				this.marble2.destroy();
+			}
+			else
+			{
+				this.winner = this.marble2;
+				this.marble1.destroy();
+			}
+
+			this.raceTrack.destroy();
+
+			this.camera.position.set(this.initialCamPos.x, this.initialCamPos.y, this.initialCamPos.z);
+			this.camera.lookAt(this.initialLookAt);
+			this.winnerBanner = new WinnerBanner(this.scene);
+			this.winnerBanner.init(this.font, this.winner.identity);
+		}
 	}
 
 	if (this.run)
@@ -500,6 +569,13 @@ Korokoro.prototype.updateStatus = function()
 		{
 			this.titleText.mesh.rotation.x -= 0.01;
 		}
+		if (this.winnerBanner)
+		{
+			this.winnerBanner.mesh.rotation.x -= 0.01;
+			this.winner.mesh.position.set(0, 1, 0);
+			this.winner.mesh.rotation.y -= 0.05;
+			this.light.position.set(0, 1, 0.75);
+		}
 		//this.camera.position.set(this.cameraPos.x, this.cameraPos.y, this.cameraPos.z);
 		//this.camera.lookAt(this.marble1.mesh.position)
 	}
@@ -542,13 +618,17 @@ Korokoro.prototype.createLetters = function()
 
 Korokoro.prototype.startGame = function()
 {
-	if (!this.run)
+	if (!this.run && !this.winner)
 	{
 		var word1 = document.getElementById('word1').value;
 		var word2 = document.getElementById('word2').value;
-		//TODO sanitize word1 & word2
-		if (word1.length == 0 || word2.length == 0)
+
+		if (!Korokoro.isAlphaOnly(word1) || !Korokoro.isAlphaOnly(word2)
+			|| word1.length == 0 || word2.length == 0)
+		{
+			alert('Please enter a word. (No numbers and symbols.)');
 			return;
+		}
 
 		document.getElementById('inputForm').style.display = 'none';
 		this.run = true;
