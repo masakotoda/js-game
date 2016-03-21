@@ -231,7 +231,7 @@ RaceTrack.prototype.init = function()
 	//_scene.add(new THREE.BoxHelper(line));
 }
 
-RaceTrack.prototype.GetCameraPos = function(t)
+RaceTrack.prototype.getCameraPos = function(t)
 {
 	var y = 3.3333;
 	var delay = 4.3333;
@@ -240,7 +240,7 @@ RaceTrack.prototype.GetCameraPos = function(t)
 	return this.GetPos(t, y, radius, delay, offset);
 }
 
-RaceTrack.prototype.GetFocusPos = function(t)
+RaceTrack.prototype.getFocusPos = function(t)
 {
 	var y = 0;
 	var delay = 0;
@@ -249,14 +249,14 @@ RaceTrack.prototype.GetFocusPos = function(t)
 	return this.GetPos(t, y, radius, delay, offset);
 }
 
-RaceTrack.prototype.GetBallPos = function(t, radius, offset)
+RaceTrack.prototype.getBallPos = function(t, radius, offset)
 {
 	var y = 0;
 	var delay = 0;
 	return this.GetPos(t, y, radius, delay, offset);
 }
 
-RaceTrack.prototype.GetIntersect = function(x, z)
+RaceTrack.prototype.getIntersect = function(x, z)
 {
 	this.raycaster.set(new THREE.Vector3(x, 10, z), new THREE.Vector3(0, -1, 0));
 	var intersects = this.raycaster.intersectObjects([this.object]);
@@ -267,16 +267,16 @@ RaceTrack.prototype.GetIntersect = function(x, z)
 	return null;
 }
 
-RaceTrack.prototype.GetVertex = function(x, z, radius)
+RaceTrack.prototype.getVertex = function(x, z, radius)
 {
-	y = this.GetIntersect(x, z).point.y;
+	y = this.getIntersect(x, z).point.y;
 	if (radius == 0)
 	{
 		return new THREE.Vector3(x, y, z);
 	}
 	else
 	{
-		var face = this.GetIntersect(x, z).face;
+		var face = this.getIntersect(x, z).face;
 		var normal = face.normal;
 		var ray = new THREE.Ray(new THREE.Vector3(x, y, z), normal);
 		var v = ray.at(radius);
@@ -399,7 +399,7 @@ RaceTrack.prototype.GetPos = function(t, y, radius, delay, offset)
 		else
 		{
 			if (delay == 0)
-				return { position: this.GetVertex(x, z, radius), velocity: new THREE.Vector3(v_x, 0, v_z) };
+				return { position: this.getVertex(x, z, radius), velocity: new THREE.Vector3(v_x, 0, v_z) };
 			else
 				return { position: new THREE.Vector3(x, y, z) };
 		}
