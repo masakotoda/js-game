@@ -1,33 +1,31 @@
 
-// Constructor
 function Korokoro()
 {
-	this.scene;
-	this.sceneTwin;
-	this.renderer;
-	this.light;
-	this.camera;
-	this.cameraPos;
+	this.scene = null;
+	this.sceneTwin = null;
+	this.renderer = null;
+	this.light = null;
+	this.camera = null;
+	this.cameraPos = null;
 
-	this.gamepad1;
-	this.gamepad2;
+	this.gamepad1 = null;
+	this.gamepad2 = null;
 
-	this.marble1;
-	this.marble2;
-	this.titleText;
+	this.marble1 = null;
+	this.marble2 = null;
+	this.titleText = null;
 	this.letters = [];
 	this.letterTextures = [];
 
-	this.raceTrack;
+	this.raceTrack = null;
 	this.gameState = Korokoro.GameState.ready;
 	this.time = 0;
 
-	this.then;
-	this.font;
-	this.winnerBanner;
+	this.then = null;
+	this.font = null;
+	this.winnerBanner = null;
 }
 
-// Enums / constants
 Korokoro.Button =
 {
 	A: 0,
@@ -44,17 +42,17 @@ Korokoro.Button =
 
 Korokoro.Key =
 {
-	KeySpace: 32,
-	Key1: 97,
-	Key3: 99,
-	Key5: 101,
-	Key4: 100,
-	Key6: 102,
-	KeyA: "A".charCodeAt(0),
-	KeyD: "D".charCodeAt(0),
-	KeyW: "W".charCodeAt(0),
-	KeyQ: "Q".charCodeAt(0),
-	KeyE: "E".charCodeAt(0)
+	keySpace: 32,
+	key1: 97,
+	key3: 99,
+	key5: 101,
+	key4: 100,
+	key6: 102,
+	keyA: "A".charCodeAt(0),
+	keyD: "D".charCodeAt(0),
+	keyW: "W".charCodeAt(0),
+	keyQ: "Q".charCodeAt(0),
+	keyE: "E".charCodeAt(0)
 }
 
 Korokoro.GameState =
@@ -90,9 +88,44 @@ Korokoro.onLetterTextureLoaded = function(texture)
 	}
 }
 
-// Member functions
-Korokoro.prototype.onLoadFunc = function() 
+Korokoro.getWord1 = function()
 {
+	return document.getElementById('word1');
+}
+
+Korokoro.getWord2 = function()
+{
+	return document.getElementById('word2');
+}
+
+Korokoro.initWords = function()
+{
+	var url = SakiUtil.getParameter("theme");
+	if (url && url.length > 0)
+	{
+		var xmlhttp = new XMLHttpRequest();
+		xmlhttp.onreadystatechange = function()
+		{
+			if (xmlhttp.readyState == 4 && xmlhttp.status == 200)
+			{
+				var resp = JSON.parse(xmlhttp.responseText);
+				var i1 = SakiUtil.getRandomInt(0, resp.length);
+				var i2 = SakiUtil.getRandomInt(0, resp.length);
+				Korokoro.getWord1().value = resp[i1];
+				Korokoro.getWord2().value = resp[i2];
+			}
+		};
+
+		xmlhttp.open("GET", url, true);
+		xmlhttp.send();
+	}
+}
+
+// Member functions
+Korokoro.prototype.onLoadFunc = function()
+{
+	Korokoro.initWords();
+
 	document.getElementById('startButton').addEventListener
 		('click', function() { _game.startGame(); });
 
@@ -102,26 +135,6 @@ Korokoro.prototype.onLoadFunc = function()
 			var orig = window.location.href;
 			window.location.href = orig;
 		});
-
-	var url = SakiUtil.getParameter("theme");
-	if (url && url.length > 0)
-	{
-		var xmlhttp = new XMLHttpRequest();
-		xmlhttp.onreadystatechange = function()
-		{
-			if (xmlhttp.readyState == 4 && xmlhttp.status == 200)
-			{
-				var j = JSON.parse(xmlhttp.responseText);
-				var i1 = SakiUtil.getRandomInt(0, j.length);
-				var i2 = SakiUtil.getRandomInt(0, j.length);
-				document.getElementById('word1').value = j[i1];
-				document.getElementById('word2').value = j[i2];
-			}
-		};
-
-		xmlhttp.open("GET", url, true);
-		xmlhttp.send();
-	}
 
 	// Grab our container div 
 	var container = document.getElementById("container"); 
@@ -149,7 +162,7 @@ Korokoro.prototype.onLoadFunc = function()
 	//light.castShadow = true; // According to the reference, it is expensive...
 
 	this.scene.add(this.light);
-	this.sceneTwin = this.scene.clone(); // For now, I'm not placing anything in twin.
+	this.sceneTwin = this.scene.clone(); // For now, I'm not placing anything in twin. So, I could delete it...
 
 	// Create a shaded, texture-mapped cube, objects and add them to the scene 
 	var texLoader = new THREE.TextureLoader();
@@ -194,9 +207,6 @@ Korokoro.prototype.onLoadFunc = function()
 		Korokoro.onLetterTextureLoaded(texture);
 	});
 
-	//var cube = new RandomCube(this.scene);
-	//cube.Init();
-
 	// Don't need to render here. (Textures are not loaded at this point anyway.)
 }
 
@@ -208,34 +218,34 @@ Korokoro.prototype.onKeyDownFunc = function(e)
 	var key = e.keyCode ? e.keyCode : e.which;
 	switch (key)
 	{
-	case Korokoro.Key.Key3:
+	case Korokoro.Key.key3:
 		this.marble1.setStatus(Marble.Status.moveRight, false);
 		break;
-	case Korokoro.Key.Key1:
+	case Korokoro.Key.key1:
 		this.marble1.setStatus(Marble.Status.moveLeft, false);
 		break;
-	case Korokoro.Key.Key5:
+	case Korokoro.Key.key5:
 		this.marble1.startJumping(Marble.Status.jump);
 		break;
-	case Korokoro.Key.Key4:
+	case Korokoro.Key.key4:
 		this.marble1.startJumping(Marble.Status.jumpLeft);
 		break;
-	case Korokoro.Key.Key6:
+	case Korokoro.Key.key6:
 		this.marble1.startJumping(Marble.Status.jumpRight);
 		break;
-	case Korokoro.Key.KeyD:
+	case Korokoro.Key.keyD:
 		this.marble2.setStatus(Marble.Status.moveRight, false);
 		break;
-	case Korokoro.Key.KeyA:
+	case Korokoro.Key.keyA:
 		this.marble2.setStatus(Marble.Status.moveLeft, false);
 		break;
-	case Korokoro.Key.KeyW:
+	case Korokoro.Key.keyW:
 		this.marble2.startJumping(Marble.Status.jump);
 		break;
-	case Korokoro.Key.KeyQ:
+	case Korokoro.Key.keyQ:
 		this.marble2.startJumping(Marble.Status.jumpLeft);
 		break;
-	case Korokoro.Key.KeyE:
+	case Korokoro.Key.keyE:
 		this.marble2.startJumping(Marble.Status.jumpRight);
 		break;
 	}
@@ -249,29 +259,33 @@ Korokoro.prototype.onKeyUpFunc = function(e)
 	var key = e.keyCode ? e.keyCode : e.which;
 	switch (key)
 	{
-	case Korokoro.Key.KeySpace:
+	case Korokoro.Key.keySpace:
 		this.startGame();
 		break;
-	case Korokoro.Key.Key3:
-		if (this.marble1.status == Marble.Status.moveRight)
+	case Korokoro.Key.key3:
+		if (this.marble1.status == Marble.Status.moveRight &&
+			this.marble1.outOfControl <= 0)
 		{
 			this.marble1.clearStatus();
 		}
 		break;
-	case Korokoro.Key.Key1:
-		if (this.marble1.status == Marble.Status.moveLeft)
+	case Korokoro.Key.key1:
+		if (this.marble1.status == Marble.Status.moveLeft &&
+			this.marble1.outOfControl <= 0)
 		{
 			this.marble1.clearStatus();
 		}
 		break;
-	case Korokoro.Key.KeyD:
-		if (this.marble2.status == Marble.Status.moveRight)
+	case Korokoro.Key.keyD:
+		if (this.marble2.status == Marble.Status.moveRight &&
+			this.marble2.outOfControl <= 0)
 		{
 			this.marble2.clearStatus();
 		}
 		break;
-	case Korokoro.Key.KeyA:
-		if (this.marble2.status == Marble.Status.moveLeft)
+	case Korokoro.Key.keyA:
+		if (this.marble2.status == Marble.Status.moveLeft &&
+			this.marble2.outOfControl <= 0)
 		{
 			this.marble2.clearStatus();
 		}
@@ -353,6 +367,7 @@ Korokoro.prototype.processState = function(m1, m2)
 {
 	if (m1.mesh && m2.mesh)
 	{
+		// process letter collision
 		var statusBefore = this.getStatusText();
 		var letter1 = m1.getCollidingLetter(this.letters);
 		if (letter1)
@@ -380,10 +395,13 @@ Korokoro.prototype.processState = function(m1, m2)
 		}
 		this.updateStatusText(statusBefore);
 
+		// update letter rotation
 		for (var i = 0; i < this.letters.length; i++)
 		{
 			this.letters[i].tick();
 		}
+
+		// process marble - marble collision
 		if (m1.outOfControl <= 0 && m2.outOfControl <=0)
 		{
 			if (m1.isCollidingTo(m2))
@@ -424,24 +442,8 @@ Korokoro.prototype.processState = function(m1, m2)
 					}
 				}
 			}
-			if (m1.outOfControl > 0)
-			{
-				m1.outOfControl--;
-				if (m1.outOfControl <= 0)
-				{
-					m1.clearStatus();
-					m1.jumpOffset = 0;
-				}
-			}
-			if (m2.outOfControl > 0)
-			{
-				m2.outOfControl--;
-				if (m2.outOfControl <= 0)
-				{
-					m2.clearStatus();
-					m2.jumpOffset = 0;
-				}
-			}
+			m1.updateOutOfControl();
+			m2.updateOutOfControl();
 		}
 	}
 }
@@ -480,6 +482,77 @@ Korokoro.prototype.removeGamepad = function(gamepad)
 	console.log("id: " + gamepad.id);
 }
 
+Korokoro.prototype.updateGameState = function()
+{
+	if (this.marble1.completed() || this.marble2.completed())
+	{
+		this.gameState = Korokoro.GameState.gameOver;
+	}
+}
+
+Korokoro.prototype.processGameOver = function()
+{
+	if (!this.winnerBanner)
+	{
+		this.winnerBanner = new WinnerBanner(this.scene);
+	}
+	this.winnerBanner.tick();
+	if (this.winnerBanner.isReady())
+	{
+		for (var i = 0; i < this.letters.length; i++)
+		{
+			this.letters[i].destroy();
+		}
+		this.letters = [];
+
+		var winner = null;
+		if (this.marble1.completed())
+		{
+			winner = this.marble1;
+			this.marble2.destroy();
+		}
+		else
+		{
+			winner = this.marble2;
+			this.marble1.destroy();
+		}
+
+		this.raceTrack.destroy();
+
+		this.camera.position.set(Korokoro.Const.initialCamPos.x, Korokoro.Const.initialCamPos.y, Korokoro.Const.initialCamPos.z);
+		this.camera.lookAt(Korokoro.Const.initialLookAt);
+		this.light.position.set(0, 1, 0.75);
+		this.winnerBanner.init(this.font, winner);
+	}
+}
+
+Korokoro.prototype.processPlaying = function()
+{
+	this.time += 0.04;
+	var camPosition = this.raceTrack.getCameraPos(this.time).position;
+	var camFocus = this.raceTrack.getFocusPos(this.time).position;
+	var ballPos1 = this.raceTrack.getBallPos(this.time, 0.16, this.marble1.offset);
+	var ballPos2 = this.raceTrack.getBallPos(this.time, 0.16, this.marble2.offset);
+
+	this.light.position.set(0, 1, 0);
+	this.camera.position.set(camPosition.x, camPosition.y, camPosition.z);
+	this.camera.lookAt(camFocus);
+	if (ballPos1 != null)
+	{
+		this.marble1.updateRotation(ballPos1.velocity);
+		this.marble1.updatePosition(ballPos1.position);
+		var shadowPos1 = this.raceTrack.getBallPos(this.time, 0, this.marble1.offset);
+		this.marble1.updateShadow(shadowPos1.position);
+	}
+	if (ballPos2 != null)
+	{
+		this.marble2.updateRotation(ballPos2.velocity);
+		this.marble2.updatePosition(ballPos2.position);
+		var shadowPos2 = this.raceTrack.getBallPos(this.time, 0, this.marble2.offset);
+		this.marble2.updateShadow(shadowPos2.position);
+	}
+}
+
 Korokoro.prototype.updateStatus = function()
 {
 	var now = Date.now();
@@ -490,88 +563,22 @@ Korokoro.prototype.updateStatus = function()
 	this.then = now;
 
 	this.scanGamepads();
-
 	this.processState(this.marble1, this.marble2);
 	this.updatePlayer(this.gamepad1, this.marble1);
 	this.updatePlayer(this.gamepad2, this.marble2);
-	this.titleText.tick();
+	this.updateGameState();
 
-	if (this.marble1.completed() || this.marble2.completed())
+	switch (this.gameState)
 	{
-		this.gameState = Korokoro.GameState.gameOver;
-
-		if (!this.winnerBanner)
-		{
-			this.winnerBanner = new WinnerBanner(this.scene);
-		}
-
-		this.winnerBanner.tick();
-		if (this.winnerBanner.isReady())
-		{
-			for (var i = 0; i < this.letters.length; i++)
-			{
-				this.letters[i].destroy();
-			}
-			this.letters = [];
-
-			var winner = null;
-			if (this.marble1.completed())
-			{
-				winner = this.marble1;
-				this.marble2.destroy();
-			}
-			else
-			{
-				winner = this.marble2;
-				this.marble1.destroy();
-			}
-
-			this.raceTrack.destroy();
-
-			this.camera.position.set(Korokoro.Const.initialCamPos.x, Korokoro.Const.initialCamPos.y, Korokoro.Const.initialCamPos.z);
-			this.camera.lookAt(Korokoro.Const.initialLookAt);
-			this.light.position.set(0, 1, 0.75);
-			this.winnerBanner.init(this.font, winner);
-		}
-	}
-
-	if (this.gameState == Korokoro.GameState.playing)
-	{
-		this.time += 0.04;
-		var camPosition = this.raceTrack.getCameraPos(this.time).position;
-		var camFocus = this.raceTrack.getFocusPos(this.time).position;
-		var ballPos1 = this.raceTrack.getBallPos(this.time, 0.16, this.marble1.offset);
-		var ballPos2 = this.raceTrack.getBallPos(this.time, 0.16, this.marble2.offset);
-		if (camFocus == null || camPosition == null)
-		{
-			this.gameState = Korokoro.GameState.gameOver;
-			this.time = 0;
-		}
-		else
-		{
-			this.light.position.set(0, 1, 0);
-			this.camera.position.set(camPosition.x, camPosition.y, camPosition.z);
-			this.camera.lookAt(camFocus);
-			if (ballPos1 != null)
-			{
-				this.marble1.updateRotation(ballPos1.velocity);
-				this.marble1.updatePosition(ballPos1.position);
-				var shadowPos1 = this.raceTrack.getBallPos(this.time, 0, this.marble1.offset);
-				this.marble1.updateShadow(shadowPos1.position);
-			}
-			if (ballPos2 != null)
-			{
-				this.marble2.updateRotation(ballPos2.velocity);
-				this.marble2.updatePosition(ballPos2.position);
-				var shadowPos2 = this.raceTrack.getBallPos(this.time, 0, this.marble2.offset);
-				this.marble2.updateShadow(shadowPos2.position);
-			}
-		}
-	}
-	else
-	{
-		//this.camera.position.set(this.cameraPos.x, this.cameraPos.y, this.cameraPos.z);
-		//this.camera.lookAt(this.marble1.mesh.position)
+	case Korokoro.GameState.ready:
+		this.titleText.tick();
+		break;
+	case Korokoro.GameState.gameOver:
+		this.processGameOver();
+		break;
+	case Korokoro.GameState.playing:
+		this.processPlaying();
+		break;
 	}
 
 	this.renderer.autoClear = false;
@@ -614,8 +621,8 @@ Korokoro.prototype.startGame = function()
 {
 	if (this.gameState == Korokoro.GameState.ready)
 	{
-		var word1 = document.getElementById('word1').value;
-		var word2 = document.getElementById('word2').value;
+		var word1 = Korokoro.getWord1().value;
+		var word2 = Korokoro.getWord2().value;
 
 		if (!SakiUtil.isAlphaOnly(word1) || !SakiUtil.isAlphaOnly(word2)
 			|| word1.length == 0 || word2.length == 0)

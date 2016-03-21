@@ -138,6 +138,7 @@ Marble.prototype.getCollidingLetter = function(letters)
 Marble.prototype.clearStatus = function()
 {
 	this.status = Marble.Status.normal;
+	this.jumpOffset = 0;
 }
 
 Marble.prototype.setStatus = function(status, force)
@@ -279,6 +280,18 @@ Marble.prototype.tick = function()
 	case Marble.Status.moveLeft:
 		this.moveLeft();
 		break;
+	}
+}
+
+Marble.prototype.updateOutOfControl = function()
+{
+	if (this.outOfControl > 0)
+	{
+		this.outOfControl--;
+		if (this.outOfControl <= 0)
+		{
+			this.clearStatus();
+		}
 	}
 }
 
