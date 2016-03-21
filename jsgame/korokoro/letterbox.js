@@ -3,10 +3,10 @@ function LetterBox(scene, letter)
 {
 	this.scene = scene;
 	this.letter = letter;
-	this.mesh;
-	this.shadow;
+	this.mesh = null;
+	this.shadow = null;
 	this.spinTimer = 0;
-	this.removed = false;
+	this.textureSwapped = false;
 }
 
 LetterBox.prototype.init = function(texture)
@@ -14,11 +14,8 @@ LetterBox.prototype.init = function(texture)
 	var material = new THREE.MeshPhongMaterial({ map: texture });
 	var geometry = new THREE.CubeGeometry(0.25, 0.25, 0.25); 
 	this.mesh = new THREE.Mesh(geometry, material); 
-	this.mesh.rotation.x = Math.PI / 5; 
-	this.mesh.rotation.y = Math.PI / 5; 
-	this.mesh.position.x = 0;
-	this.mesh.position.y = 0;
-	this.mesh.position.z = -1.0;
+	this.mesh.rotation.set(Math.PI/5, Math.PI/5, 0);
+	this.mesh.position.set(0, 0, -1);
 	this.scene.add(this.mesh);
 
 	this.createShadow();
@@ -72,9 +69,9 @@ LetterBox.prototype.tick = function()
 	}
 }
 
-LetterBox.prototype.removeFromScene = function(texture)
+LetterBox.prototype.swapTexture = function(texture)
 {
-	this.removed = true;
+	this.textureSwapped = true;
 	this.mesh.material.map = texture;
 	this.mesh.material.needsUpdate = true;
 }
@@ -96,4 +93,12 @@ LetterBox.prototype.setPos = function(pos, shadowPos)
 	this.shadow.position.x = shadowPos.position.x;
 	this.shadow.position.y = shadowPos.position.y + 0.05;
 	this.shadow.position.z = shadowPos.position.z;
+}
+
+LetterBox.prototype.checkLetter = function(letter)
+{
+	if (this.textureSwapped)
+		return false;
+
+	return (this.letter == letter);
 }

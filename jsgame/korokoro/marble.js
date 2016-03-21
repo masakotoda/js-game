@@ -51,9 +51,10 @@ Marble.prototype.hitTest = function(letters)
 	return null;
 }
 
-Marble.prototype.checkLetter = function(letter)
+Marble.prototype.checkLetterBox = function(letterBox)
 {
-	if (this.phrase[this.phrasePos] == letter)
+	var next = this.phrase[this.phrasePos];
+	if (letterBox.checkLetter(next))
 	{
 		this.phrasePos++;
 		return true;

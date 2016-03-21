@@ -308,9 +308,9 @@ Korokoro.prototype.processState = function(m1, m2)
 		var letter1 = m1.hitTest(this.letters);
 		if (letter1)
 		{
-			if (!letter1.removed && this.marble1.checkLetter(letter1.letter))
+			if (this.marble1.checkLetterBox(letter1))
 			{
-				letter1.removeFromScene(this.marble1.mesh.material.map);
+				letter1.swapTexture(this.marble1.mesh.material.map);
 			}
 			else if (!letter1.isSpinning())
 			{
@@ -320,14 +320,12 @@ Korokoro.prototype.processState = function(m1, m2)
 		var letter2 = m2.hitTest(this.letters);
 		if (letter2)
 		{
-			if (!letter2.removed && this.marble2.checkLetter(letter2.letter))
+			if (this.marble2.checkLetterBox(letter2))
 			{
-				m2.point += 100;
-				letter2.removeFromScene(this.marble2.mesh.material.map);
+				letter2.swapTexture(this.marble2.mesh.material.map);
 			}
 			else if (!letter2.isSpinning())
 			{
-				m2.point += 10;
 				letter2.startSpin();
 			}
 		}
