@@ -12,7 +12,7 @@ function _updateStatus()
 
 function _korokoro()
 {
-	window.addEventListener("load", function() {
+	window.addEventListener('load', function() {
 		_game.onLoadFunc();
 		_updateStatus();
 	});
@@ -28,10 +28,10 @@ function _korokoro()
 	var hasEvents = 'GamepadEvent' in window;
 	if (hasEvents)
 	{
-		window.addEventListener("gamepadconnected", function(e) {
+		window.addEventListener('gamepadconnected', function(e) {
 			_game.addGamepad(e.gamepad);
 		});
-		window.addEventListener("gamepaddisconnected", function(e) {
+		window.addEventListener('gamepaddisconnected', function(e) {
 			_game.removeGamepad(e.gamepad);
 		});
 	}

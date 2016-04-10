@@ -122,6 +122,14 @@ Korokoro.initWords = function()
 }
 
 // Member functions
+Korokoro.prototype.assignButtonToKey = function(button, key)
+{
+	document.getElementById(button).addEventListener
+		('mousedown', function() {_game.onKeyDownFunc({keyCode: key});});
+	document.getElementById(button).addEventListener
+		('mouseup', function() {_game.onKeyUpFunc({keyCode: key});});
+}
+
 Korokoro.prototype.onLoadFunc = function()
 {
 	Korokoro.initWords();
@@ -136,7 +144,18 @@ Korokoro.prototype.onLoadFunc = function()
 			window.location.href = orig;
 		});
 
-	// Grab our container div 
+	this.assignButtonToKey('buttonQ', Korokoro.Key.keyQ);
+	this.assignButtonToKey('buttonW', Korokoro.Key.keyW);
+	this.assignButtonToKey('buttonE', Korokoro.Key.keyE);
+	this.assignButtonToKey('buttonA', Korokoro.Key.keyA);
+	this.assignButtonToKey('buttonD', Korokoro.Key.keyD);
+	this.assignButtonToKey('button4', Korokoro.Key.key4);
+	this.assignButtonToKey('button5', Korokoro.Key.key5);
+	this.assignButtonToKey('button6', Korokoro.Key.key6);
+	this.assignButtonToKey('button1', Korokoro.Key.key1);
+	this.assignButtonToKey('button3', Korokoro.Key.key3);
+
+	// Grab our container div
 	var container = document.getElementById("container"); 
 
 	// Create the Three.js renderer, add it to our div 
